@@ -6,7 +6,7 @@
     "desc": null,
     "icon": "cyfz",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 2,

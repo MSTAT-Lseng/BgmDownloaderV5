@@ -1,0 +1,20 @@
+{
+  "search_config": {
+    "url": "{host}/search.html?wd={q}",
+    "item_regex": "<div class=\"[^\"]*search-box[^\"]*\">[\\s\\S]*?data-src=\"([^\"]+)\"[\\s\\S]*?<div class=\"thumb-txt[^\"]*\">[\\s\\S]*?<a[^>]*href=\"([^\"]+)\"[^>]*>([\\s\\S]*?)<\\/a>",
+    "fields": {
+      "image": {
+        "match_index": 1,
+        "description": "作品封面图片地址"
+      },
+      "url": {
+        "match_index": 2,
+        "description": "详情页跳转链接"
+      },
+      "title": {
+        "match_index": 3,
+        "description": "作品标题名称"
+      }
+    }
+  }
+}
