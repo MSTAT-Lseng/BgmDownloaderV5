@@ -1,25 +1,29 @@
 {
   "expo": {
-    "name": "BgmDownloaderV5",
+    "name": "番剧下载",
     "slug": "BgmDownloaderV5",
-    "version": "1.0.0",
+    "version": "5.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "bgmdownloaderv5",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark", // dark mode
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "m20.bgm.downloader.v5",
+      "userInterfaceStyle": "dark",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
+      "icon": "./assets/images/icon.png",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "m20.bgm.downloader.v5",
+      "userInterfaceStyle": "dark"
     },
     "web": {
       "output": "static",
@@ -38,11 +42,25 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c33e6a6b-518d-4016-b9c2-4bf14e354fdf"
+      }
     }
   }
 }
