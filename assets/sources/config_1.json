@@ -1,6 +1,7 @@
 {
   "search_config": {
     "url": "{host}/search.html?wd={q}",
+    "details_format": "{host}{result}",
     "item_regex": "<div class=\"[^\"]*search-box[^\"]*\">[\\s\\S]*?data-src=\"([^\"]+)\"[\\s\\S]*?<div class=\"thumb-txt[^\"]*\">[\\s\\S]*?<a[^>]*href=\"([^\"]+)\"[^>]*>([\\s\\S]*?)<\\/a>",
     "fields": {
       "image": {
