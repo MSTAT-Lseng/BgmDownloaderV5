@@ -1,3 +1,6 @@
+import {
+  getSearchTimeout,
+} from '@/src/services/storage/searchTimeout';
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
@@ -57,6 +60,9 @@ export default function SearchScreen() {
     setLoading(true);
     setResults([]);
 
+    // 实时获取最新的配置
+    const timeout = await getSearchTimeout();
+
     const activeSources = sourceIndex.filter((s: any) => s.enabled && s.adaptation);
 
     const searchTasks = activeSources.map(async (source: any) => {
@@ -65,7 +71,7 @@ export default function SearchScreen() {
 
       // 1. 创建 AbortController
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5500); // 5.5秒超时
+      const timeoutId = setTimeout(() => controller.abort(), timeout * 1000); // 5.5秒超时
 
       try {
         const { search_config } = config;

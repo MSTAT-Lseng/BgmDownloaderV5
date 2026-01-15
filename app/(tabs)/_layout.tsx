@@ -1,4 +1,4 @@
-import { Tabs, useSegments } from "expo-router";
+import { Tabs, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
@@ -14,7 +14,6 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { useEffect } from 'react';
 
 import { Ionicons } from "@expo/vector-icons"; // Expo 内置图标库
-import { Alert } from "react-native";
 
 function TabItem({
   label,
@@ -51,6 +50,7 @@ export default function TabsLayout() {
 
   const segments = useSegments();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const titleMap: Record<string, string> = {
     index: "日历",
@@ -66,7 +66,9 @@ export default function TabsLayout() {
       <StatusBar style="light" translucent={true} />
       <AppHeader title={title}
         icon={<Ionicons name="settings-outline" size={24} color="#EAF0FF" />} 
-        onIconPress={() => Alert.alert("点击了设置")}
+        onIconPress={() => router.push({
+          pathname: "/settings",
+        })}
       />
 
       <Tabs
