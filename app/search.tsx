@@ -18,6 +18,12 @@ const sourceConfigs: Record<number, any> = {
   6: require(`${SOURCES_DIR}/config_6.json`),
   7: require(`${SOURCES_DIR}/config_7.json`),
   9: require(`${SOURCES_DIR}/config_9.json`),
+  10: require(`${SOURCES_DIR}/config_10.json`),
+  11: require(`${SOURCES_DIR}/config_11.json`),
+  12: require(`${SOURCES_DIR}/config_12.json`),
+  14: require(`${SOURCES_DIR}/config_14.json`),
+  16: require(`${SOURCES_DIR}/config_16.json`),
+  18: require(`${SOURCES_DIR}/config_18.json`),
 };
 
 interface SearchResult {
@@ -126,7 +132,12 @@ export default function SearchScreen() {
       // 注意：match[0] 是完整匹配，group 从 1 开始
       const image = match[fields.image.match_index] || "";
       const url = match[fields.url.match_index] || "";
-      const title = match[fields.title.match_index] || "";
+      let title = match[fields.title.match_index] || "";
+
+      // ID 18 特殊处理，其标签含有 span。
+      if (title.includes("<span")) {
+        title = title.replace(/<\/?span[^>]*>/g, '');
+      }
 
       if (title && url) {
         list.push({
@@ -138,6 +149,8 @@ export default function SearchScreen() {
         });
       }
     }
+
+    console.log(`${sourceName} 搜索数量：`, list.length);
     return list;
   };
 

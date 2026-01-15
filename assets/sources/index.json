@@ -87,7 +87,7 @@
     "desc": "有广告，视频清晰。",
     "icon": "xifanacg",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 11,
@@ -96,7 +96,7 @@
     "desc": "有广告，视频高清。",
     "icon": "dmbus",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 12,
@@ -105,7 +105,7 @@
     "desc": "少量广告，视频清晰。",
     "icon": "girigirilove",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 13,
@@ -123,7 +123,7 @@
     "desc": "有广告，视频清晰。",
     "icon": "gugu3",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 15,
@@ -141,7 +141,7 @@
     "desc": "有广告，视频高清。",
     "icon": "mxdm",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 17,
@@ -159,7 +159,7 @@
     "desc": "有广告，画质清晰。",
     "icon": "11kt",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 19,

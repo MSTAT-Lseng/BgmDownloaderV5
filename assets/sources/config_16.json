@@ -1,0 +1,21 @@
+{
+  "search_config": {
+    "url": "{host}/search/-------------.html?wd={q}",
+    "details_format": "{host}{result}",
+    "item_regex": "module-search-item\">[\\s\\S]*?data-src=\"([^\"]+)\"[\\s\\S]*?<h3><a href=\"([^\"]+)\" title=\"([^\"]+)\"",
+    "fields": {
+      "url": {
+        "match_index": 2,
+        "description": "详情页跳转链接"
+      },
+      "image": {
+        "match_index": 1,
+        "description": "作品封面图片地址"
+      },
+      "title": {
+        "match_index": 3,
+        "description": "作品标题名称"
+      }
+    }
+  }
+}
