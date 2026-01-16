@@ -1,5 +1,7 @@
 import { AppHeader } from '@/components/app-header';
 import { Ionicons } from '@expo/vector-icons';
+import { Asset } from 'expo-asset';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Linking from 'expo-linking';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -7,7 +9,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-export default function WebviewPage() {
+export default function WebviewScreen() {
   const navigation = useNavigation();
   const {
     url,
@@ -39,6 +41,28 @@ export default function WebviewPage() {
       useNativeDriver: false,
     }).start();
   }, [progress]);
+
+  // Script
+  const [script, setScript] = useState('');
+
+  useEffect(() => {
+  async function loadInternalScript() {
+      try {
+        // 1. 加载资源
+        const [{ localUri }] = await Asset.loadAsync(require('../assets/sources/config_scripts.js.txt'));
+        if (localUri) {
+          // 2. 读取文件内容为字符串
+          const content = await FileSystem.readAsStringAsync(localUri);
+          if (type == "player") {
+            setScript(content);
+          }
+        }
+      } catch (e) {
+        console.error("加载脚本失败", e);
+      }
+    }
+    loadInternalScript();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -100,6 +124,8 @@ export default function WebviewPage() {
               setErrorText(e?.nativeEvent?.description ?? '页面加载失败');
               setTitle('加载失败');
             }}
+            injectedJavaScript={script}
+            onMessage={() => {}}
             // 常用配置
             javaScriptEnabled
             domStorageEnabled

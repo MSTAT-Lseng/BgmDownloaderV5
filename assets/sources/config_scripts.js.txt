@@ -1,0 +1,106 @@
+const regex_module = {
+
+    // ID: 1
+    // 搜索页
+    "www\\.cyfz\\.vip\\\/(search\\.html\\?wd=|search\\\/page\\\/)": {
+        "hidden_elements": [
+            "div.head.flex.between.head-c.header_nav0",
+            "div.m-search",
+        ],
+        "custom_css": {
+          "div.row.flex.wrap.top40": {
+            "margin-top": "0"
+          },
+          "div.row-9": {
+            "padding-bottom": "25px"
+          }
+        }
+    },
+    // 详情页
+    "www\\.cyfz\\.vip\\\/pages\\\/": {
+      "hidden_elements": [
+        // 下面这俩是一个，适配不同的屏幕大小
+        ".box-width.wow.fadeInUp|1",
+        ".box-width.wow.fadeInUp.animated|1",
+
+        // 下面这俩是一个，适配不同的滑动位置
+        ".head.flex.between.no-null.header_nav0.head-b",
+        ".head.flex.between.no-null.header_nav0"
+      ],
+      "custom_css": {
+        ".vod-detail.style-detail.rel.cor1.hader0": {
+          "padding-top": "20px"
+        }
+      }
+    },
+    // 播放页
+    "www\\.cyfz\\.vip\\\/vodplay\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.head-c.header_nav0",
+        ".head.flex.between.head-c.header_nav0.head-b",
+        ".fun.flex.between.box.radius",
+        ".wap-diy-vod-a-box.tim-box"
+      ],
+    }
+
+}
+
+function regexModuleRunner(config, targetStr = window.location.href) {
+  Object.keys(config).forEach(pattern => {
+    const regex = new RegExp(pattern);
+    
+    // 1. 检查正则是否匹配
+    if (regex.test(targetStr)) {
+
+      // hidden elements
+      if (config[pattern].hasOwnProperty('hidden_elements')) {
+        const hidden_elements = config[pattern].hidden_elements;
+        
+        // 遍历并执行 display: none
+        hidden_elements.forEach(selector => {
+          try {
+            if (selector.includes('|')) {
+              const [_selector, index] = selector.split('|');
+              const elements = document.querySelectorAll(_selector);
+              const targetIndex = parseInt(index);
+
+              // 检查元素是否存在且索引有效
+              if (elements[targetIndex]) {
+                elements[targetIndex].style.display = 'none';
+              }
+            } else {
+              const elements = document.querySelectorAll(selector);
+              elements.forEach(el => {
+                el.style.display = 'none';
+              });
+            }
+          } catch (error) {
+            console.error(`无法处理选择器 "${selector}":`, error);
+          }
+        });
+      }
+      
+      // custom css
+      if (config[pattern].hasOwnProperty('custom_css')) {
+        const custom_css = config[pattern].custom_css;
+        
+        // 遍历并执行 custom_css
+        Object.keys(custom_css).forEach(selector => {
+          document.querySelectorAll(selector).forEach(el => {
+            Object.keys(custom_css[selector]).forEach(property => {
+              el.style[property] = custom_css[selector][property];
+            })
+          })
+        })
+      }
+      
+    }
+  });
+}
+
+// 执行解析
+regexModuleRunner(regex_module);
+
+// iOS
+window.ReactNativeWebView.postMessage('hello');
+true;

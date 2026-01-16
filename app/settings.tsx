@@ -16,7 +16,7 @@ import {
   View
 } from 'react-native';
 
-export default function App() {
+export default function SettingsScreen() {
   const navigation = useNavigation();
   
   // 状态控制

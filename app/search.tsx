@@ -4,13 +4,15 @@ import {
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Toast from 'react-native-root-toast';
 import { AppHeader } from "../components/app-header";
 
 const SOURCES_DIR = "../assets/sources/";
 
 // 导入源列表
+import { getMoreSearchAlert, setMoreSearchAlert } from '@/src/services/storage/moreSearchAlert';
+import { Ionicons } from '@expo/vector-icons';
 import sourceIndex from "../assets/sources/index.json";
 
 // 由于 RN 不支持动态 require，需手动建立映射)
@@ -117,6 +119,11 @@ export default function SearchScreen() {
       await Promise.allSettled(searchTasks);
     } finally {
       setLoading(false);
+      const searchAlertStatus = await getMoreSearchAlert();
+      if (searchAlertStatus) {
+        await setMoreSearchAlert(false);
+        Alert.alert('提示', '如果没有找到您想要的动漫，可以点击标题栏右上角使用更多的网站来手动检索。');
+      }
     }
   };
 
@@ -171,6 +178,8 @@ export default function SearchScreen() {
       <StatusBar style="light" translucent={true} />
       <AppHeader title={q ? `搜索: ${q}` : "搜索"} showBack={true} 
         onBackPress={() => navigation.goBack()}
+        icon={<Ionicons name="albums-outline" size={24} color="#EAF0FF" />}
+        onIconPress={() => router.push("/pages/more_search")}
       />
 
       <FlatList
