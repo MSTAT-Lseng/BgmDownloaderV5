@@ -3,7 +3,7 @@
     "name": "番剧下载",
     "slug": "BgmDownloaderV5",
     "version": "5.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "bgmdownloaderv5",
     "userInterfaceStyle": "dark", // dark mode

@@ -4,8 +4,9 @@ import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Linking from 'expo-linking';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
+import * as ScreenOrientation from "expo-screen-orientation";
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -62,6 +63,35 @@ export default function WebviewScreen() {
       }
     }
     loadInternalScript();
+  }, []);
+
+  const handleMessage = useCallback(async (event: any) => {
+    let data: any = null;
+    try {
+      data = JSON.parse(event?.nativeEvent?.data || "{}");
+    } catch {
+      return;
+    }
+
+    if (data.type === "enter_fullscreen") {
+      // 进入全屏 -> 锁横屏
+      // iOS 上能否立刻旋转还取决于系统策略、用户是否锁定竖屏、页面是否真进入全屏等
+      try {
+        await ScreenOrientation.lockAsync(
+          ScreenOrientation.OrientationLock.LANDSCAPE
+        );
+      } catch {}
+    }
+
+    if (data.type === "exit_fullscreen") {
+      // 退出全屏 -> 恢复竖屏（或 unlockAsync 跟随系统）
+      try {
+        await ScreenOrientation.lockAsync(
+          ScreenOrientation.OrientationLock.PORTRAIT_UP
+        );
+        // 或者：await ScreenOrientation.unlockAsync();
+      } catch {}
+    }
   }, []);
 
   return (
@@ -125,7 +155,7 @@ export default function WebviewScreen() {
               setTitle('加载失败');
             }}
             injectedJavaScript={script}
-            onMessage={() => {}}
+            onMessage={handleMessage}
             // 常用配置
             javaScriptEnabled
             domStorageEnabled
@@ -133,7 +163,9 @@ export default function WebviewScreen() {
             allowsBackForwardNavigationGestures
             setSupportMultipleWindows={false}
             allowsFullscreenVideo={true}     // 允许全屏视频 (主要针对 Android)
-            allowsInlineMediaPlayback={true} // 允许行内播放 (iOS 必须)
+            mediaPlaybackRequiresUserAction={true} // 让用户手势触发播放/全屏更稳
+            // allowsInlineMediaPlayback={true} // 允许行内播放 (iOS 必须)
+            mixedContentMode="always"
           />
 
           {!!errorText && (
