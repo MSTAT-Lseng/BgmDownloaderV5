@@ -1,10 +1,10 @@
 import {
   getSearchTimeout,
 } from '@/src/services/storage/searchTimeout';
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Toast from 'react-native-root-toast';
 import { AppHeader } from "../components/app-header";
 
@@ -27,6 +27,8 @@ const sourceConfigs: Record<number, any> = {
   14: require(`${SOURCES_DIR}/config_14.json`),
   16: require(`${SOURCES_DIR}/config_16.json`),
   18: require(`${SOURCES_DIR}/config_18.json`),
+  21: require(`${SOURCES_DIR}/config_21.json`),
+  24: require(`${SOURCES_DIR}/config_24.json`),
 };
 
 interface SearchResult {
@@ -162,6 +164,7 @@ export default function SearchScreen() {
 
   // 在你的页面组件内
   const navigation = useNavigation();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -187,7 +190,10 @@ export default function SearchScreen() {
                   {item.sourceUrl} 
                 </Text>
               </View>
-              <TouchableOpacity style={styles.viewAllBtn} onPress={() => Linking.openURL(item.searchUrl)}>
+              <TouchableOpacity style={styles.viewAllBtn} onPress={() => router.push({
+                pathname: "/webview",
+                params: { url: item.searchUrl, type: "player" },
+              })}>
                 <Text style={styles.viewAllBtnText}>查看全部</Text>
               </TouchableOpacity>
             </View>
@@ -199,7 +205,10 @@ export default function SearchScreen() {
               style={styles.horizontalList}
               keyExtractor={(res) => res.id}
               renderItem={({ item: res }) => (
-                <TouchableOpacity style={styles.horizontalItem} onPress={() => Linking.openURL(res.url)}>
+                <TouchableOpacity style={styles.horizontalItem} onPress={() => router.push({
+                  pathname: "/webview",
+                  params: { url: res.url, type: "player" },
+                })}>
                   <Image source={{ uri: res.image }}
                     style={styles.horizontalCover} resizeMode="cover" />
                   <Text style={styles.horizontalTitle} numberOfLines={1}>{res.title}</Text>

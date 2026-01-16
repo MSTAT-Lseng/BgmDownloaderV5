@@ -186,7 +186,7 @@
     "desc": "有广告，视频清晰。",
     "icon": "706dm",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 22,
@@ -213,13 +213,13 @@
     "desc": "经典动漫站点，有广告",
     "icon": "agedm",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 25,
     "name": "樱花动漫",
     "url": "https://www.xdm6.com",
-    "desc": "感谢“异世界jojo”的分享和反馈，有广告",
+    "desc": "有广告",
     "icon": "xdm6",
     "enabled": true,
     "adaptation": false
@@ -228,7 +228,7 @@
     "id": 26,
     "name": "Anime1动漫",
     "url": "https://anime1.me",
-    "desc": "感谢“讥笑”的分享，有广告，画质中等",
+    "desc": "有广告，画质中等",
     "icon": "anime1",
     "enabled": true,
     "adaptation": false

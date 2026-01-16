@@ -1,12 +1,12 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   FlatList,
   Image,
-  Linking,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 // 1. 直接导入 JSON
@@ -59,12 +59,16 @@ function getIcon(iconName: string) {
 
 export default function SourceScreen() {
   const data = (sources as SourceItem[]).filter(item => item.enabled);
+  const router = useRouter();
 
   const renderItem = ({ item }: { item: SourceItem }) => (
     <TouchableOpacity
       style={styles.card}
       activeOpacity={0.8}
-      onPress={() => Linking.openURL(item.url)}
+      onPress={() => router.push({
+        pathname: "/webview",
+        params: { url: item.url, type: "sources" },
+      })}
     >
       <Image
         source={getIcon(item.icon)}
