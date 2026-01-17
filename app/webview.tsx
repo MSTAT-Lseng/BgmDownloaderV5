@@ -1,4 +1,5 @@
 import { AppHeader } from '@/components/app-header';
+import { FavoritesDB } from '@/src/services/storage/FavoriteDatabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -7,15 +8,12 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 import * as ScreenOrientation from "expo-screen-orientation";
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 export default function WebviewScreen() {
   const navigation = useNavigation();
-  const {
-    url,
-    type = 'default' // 1. 接收 type 参数，默认为 'default'
-  } = useLocalSearchParams < {
+  const { url, type = 'default' /* 1. 接收 type 参数，默认为 'default'*/ } = useLocalSearchParams < {
     url ? : string,
     type ?: string;
   } > ();
@@ -50,7 +48,8 @@ export default function WebviewScreen() {
   async function loadInternalScript() {
       try {
         // 1. 加载资源
-        const [{ localUri }] = await Asset.loadAsync(require('../assets/sources/config_scripts.js.txt'));
+        const [{ localUri }] = 
+          await Asset.loadAsync(require('../assets/sources/config_scripts.js.txt'));
         if (localUri) {
           // 2. 读取文件内容为字符串
           const content = await FileSystem.readAsStringAsync(localUri);
@@ -94,6 +93,55 @@ export default function WebviewScreen() {
     }
   }, []);
 
+  const { url: initialUrl } = useLocalSearchParams<{ url?: string }>();
+  const [currentUrl, setCurrentUrl] = useState(Array.isArray(initialUrl) ? initialUrl[0] : initialUrl || '');
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [favoriteName, setFavoriteName] = useState('');
+
+  // 检查当前 URL 是否已收藏
+  const checkFavoriteStatus = useCallback(async (url: string) => {
+    // 如果不是播放器类型或 URL 为空，直接返回
+    if (type !== 'player' || !url) {
+      setIsFavorite(false);
+      return;
+    }
+
+    // 异步检查前，可以根据需要决定是否重置（推荐重置，避免旧页面的状态残留）
+    const exists = await FavoritesDB.exists(url);
+    setIsFavorite(exists);
+  }, [type]); // 注意：这里依赖项应包含 type (你代码中是 types，请统一变量名)
+
+  // 监听 currentUrl 的变化
+  useEffect(() => {
+    // 当 URL 变化时，先重置状态，防止显示上一个网页的收藏状态
+    setIsFavorite(false); 
+    
+    if (currentUrl) {
+      checkFavoriteStatus(currentUrl);
+    }
+  }, [currentUrl, checkFavoriteStatus]);
+  // 修改后的收藏点击处理
+  const handleFavoritePress = async () => {
+    if (isFavorite) {
+      await FavoritesDB.removeByUrl(currentUrl);
+      setIsFavorite(false);
+      return;
+    }
+    // 打开自定义模态框
+    setFavoriteName(title); 
+    setModalVisible(true);
+  };
+
+  const saveFavorite = async () => {
+    if (favoriteName.trim()) {
+      await FavoritesDB.upsert({ name: favoriteName, url: currentUrl });
+      setIsFavorite(true);
+      setModalVisible(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" translucent />
@@ -102,80 +150,121 @@ export default function WebviewScreen() {
         title={title}
         showBack={true}
         onBackPress={() => navigation.goBack()}
-        {...(type === 'sources' && { 
+        {...(type === 'sources' && {
             icon: <Ionicons name="open-outline" size={24} color="#EAF0FF" />, 
             onIconPress: () => Linking.openURL(webUrl)
+        })}
+        {...(type === 'player' && {
+            icon: <Ionicons name={isFavorite ? "star-half-outline" : "star-outline"} size={24} color="#EAF0FF" />, 
+            onIconPress: handleFavoritePress
         })}
       />
 
       <View style={styles.webWrap}>
         {/* 进度条容器 */}
-          {progress < 1 && (
-            <View style={styles.progressContainer}>
-              <Animated.View 
-                style={[
-                  styles.progressBar, 
-                    { 
-                      width: animatedProgress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ['0%', '100%'],
-                      }) 
-                    }
-                ]}
-              />
-            </View>
-          )}
+        {progress < 1 && (
+          <View style={styles.progressContainer}>
+            <Animated.View 
+              style={[
+                styles.progressBar, 
+                  { 
+                    width: animatedProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0%', '100%'],
+                    }) 
+                  }
+              ]}
+            />
+          </View>
+        )}
 
-          <WebView
-            ref={webRef}
-            source={{ uri: webUrl }}
-            // 核心：强制所有链接在当前 WebView 中打开
-            onShouldStartLoadWithRequest={(request) => {
-                // 允许加载所有 http 和 https 链接
-                if (request.url.startsWith('http')) {
-                return true; 
-                }
-                // 可以在这里处理其他协议，如 tel: 或 mailto:
-                return false;
-            }}
-            style={styles.web}
-            onLoadProgress={({ nativeEvent }) => {
-                setProgress(nativeEvent.progress); // progress 是 0 到 1 之间的浮点数
-            }}
-            onLoadStart={() => {
-                setProgress(0);
-                setErrorText(null);
-            }}
-            onLoadEnd={() => setProgress(1)}
-            onNavigationStateChange={(navState) => {
-              if (navState?.title) setTitle(navState.title);
-            }}
-            onError={(e) => {
-              setErrorText(e?.nativeEvent?.description ?? '页面加载失败');
-              setTitle('加载失败');
-            }}
-            injectedJavaScript={script}
-            onMessage={handleMessage}
-            // 常用配置
-            javaScriptEnabled
-            domStorageEnabled
-            startInLoadingState
-            allowsBackForwardNavigationGestures
-            setSupportMultipleWindows={false}
-            allowsFullscreenVideo={true}     // 允许全屏视频 (主要针对 Android)
-            mediaPlaybackRequiresUserAction={true} // 让用户手势触发播放/全屏更稳
-            // allowsInlineMediaPlayback={true} // 允许行内播放 (iOS 必须)
-            mixedContentMode="always"
-          />
+        <WebView
+          ref={webRef}
+          source={{ uri: webUrl }}
+          // 核心：强制所有链接在当前 WebView 中打开
+          onShouldStartLoadWithRequest={(request) => {
+            // 允许加载所有 http 和 https 链接
+            if (request.url.startsWith('http')) {
+              return true; 
+            }
+            // 可以在这里处理其他协议，如 tel: 或 mailto:
+            return false;
+          }}
+          style={styles.web}
+          onLoadProgress={({ nativeEvent }) => {
+            setProgress(nativeEvent.progress); // progress 是 0 到 1 之间的浮点数
+          }}
+          onLoadStart={() => {
+            setProgress(0);
+            setErrorText(null);
+          }}
+          onLoadEnd={() => setProgress(1)}
+          onNavigationStateChange={(navState) => {
+            if (navState?.title) setTitle(navState.title);
+            // navState.url 会随页面跳转实时改变
+            if (navState.url) {
+              setCurrentUrl(navState.url);
+            }
+          }}
+          onError={(e) => {
+            setErrorText(e?.nativeEvent?.description ?? '页面加载失败');
+            setTitle('加载失败');
+          }}
+          injectedJavaScript={script}
+          onMessage={handleMessage}
+          // 常用配置
+          javaScriptEnabled
+          domStorageEnabled
+          startInLoadingState
+          allowsBackForwardNavigationGestures
+          setSupportMultipleWindows={false}
+          allowsFullscreenVideo={true}     // 允许全屏视频 (主要针对 Android)
+          mediaPlaybackRequiresUserAction={true} // 让用户手势触发播放/全屏更稳
+          // allowsInlineMediaPlayback={true} // 允许行内播放 (iOS 必须)
+          mixedContentMode="always"
+        />
 
-          {!!errorText && (
-            <View style={styles.errorMask}>
-              <Text style={styles.errorTitle}>加载失败</Text>
-              <Text style={styles.errorDesc}>{errorText}</Text>
-              <Text style={styles.errorDesc}>URL: {webUrl}</Text>
+        {!!errorText && (
+          <View style={styles.errorMask}>
+            <Text style={styles.errorTitle}>加载失败</Text>
+            <Text style={styles.errorDesc}>{errorText}</Text>
+            <Text style={styles.errorDesc}>URL: {webUrl}</Text>
+          </View>
+        )}
+      </View>
+
+      {/* 自定义收藏模态框 */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>添加收藏</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={favoriteName}
+              onChangeText={setFavoriteName}
+              placeholder="请输入名称"
+              placeholderTextColor="#666"
+              autoFocus
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalBtn, { borderRightWidth: StyleSheet.hairlineWidth, borderColor: '#333' }]} 
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalBtnText}>取消</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalBtn} onPress={saveFavorite}>
+                <Text style={[styles.modalBtnText, { color: '#3B82F6', fontWeight: '600' }]}>保存</Text>
+              </TouchableOpacity>
             </View>
-          )}
+          </View>
         </View>
+      </Modal>
     </View>
   );
 }
@@ -221,5 +310,52 @@ const styles = StyleSheet.create({
   progressBar: {
     height: '100%',
     backgroundColor: '#3B82F6', // 建议使用亮蓝色
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  modalContent: {
+    width: '100%',
+    backgroundColor: '#1C1C1E',
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  modalTitle: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+    textAlign: 'center',
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  modalInput: {
+    backgroundColor: '#2C2C2E',
+    color: '#fff',
+    marginHorizontal: 16,
+    marginVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    fontSize: 14,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderColor: '#333',
+    marginTop: 10,
+  },
+  modalBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  modalBtnText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
