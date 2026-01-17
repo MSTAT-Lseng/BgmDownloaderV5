@@ -4,7 +4,8 @@ import {
   setSearchTimeout,
 } from '@/src/services/storage/searchTimeout';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from 'expo-router';
+import Constants from 'expo-constants';
+import { router, useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -56,6 +57,11 @@ export default function SettingsScreen() {
     }
   };
 
+  const currentVersion = 
+      Constants.expoConfig?.version ?? 
+      Constants.nativeAppVersion ?? 
+      '0.0.0';
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" translucent={true} />
@@ -86,23 +92,23 @@ export default function SettingsScreen() {
               trackColor={{ false: "#3e3e3e", true: "#007AFF" }}
             />
           }
-        />
+        />*/}
 
-        <Text style={styles.sectionTitle}>账户</Text>*/}
+        <Text style={styles.sectionTitle}>关于</Text>
 
         {/* 普通箭头跳转 */}
         {/*<SettingItem 
           title="个人资料" 
           icon="person-outline"
           onPress={() => {}} 
-        />
+        />*/}
         
         <SettingItem 
-          title="关于我们" 
+          title="关于软件" 
           icon="information-circle-outline"
-          rightText="v1.0.1"
-          onPress={() => {}} 
-        />*/}
+          rightText={currentVersion}
+          onPress={() => router.push('/pages/about')} 
+        />
       </View>
 
       {/* 超时时间选择弹窗 */}
