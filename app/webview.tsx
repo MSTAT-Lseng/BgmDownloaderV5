@@ -43,26 +43,70 @@ export default function WebviewScreen() {
 
   // Script
   const [script, setScript] = useState('');
-
+  const [fullScreenScript, setFullScreenScript] = useState('');
   useEffect(() => {
-  async function loadInternalScript() {
+    const loadScripts = async () => {
+      // 只有类型匹配时才加载，减少无谓的 IO 操作
+      if (type !== "player") return;
+
       try {
-        // 1. 加载资源
-        const [{ localUri }] = 
-          await Asset.loadAsync(require('../assets/sources/config_scripts.js.txt'));
-        if (localUri) {
-          // 2. 读取文件内容为字符串
-          const content = await FileSystem.readAsStringAsync(localUri);
-          if (type == "player") {
-            setScript(content);
+        const scriptsToLoad = [
+          { 
+            source: require('../assets/sources/fullscreen_scripts.js.txt'), 
+            setter: setFullScreenScript 
           }
-        }
+        ];
+
+        await Promise.all(scriptsToLoad.map(async ({ source, setter }) => {
+          const [{ localUri }] = await Asset.loadAsync(source);
+          if (localUri) {
+            const content = await FileSystem.readAsStringAsync(localUri);
+            setter(content);
+          }
+        }));
       } catch (e) {
-        console.error("加载脚本失败", e);
+        console.error("加载脚本失败:", e);
       }
+    };
+
+    loadScripts();
+  }, [type]); // 加入 type 依赖，确保逻辑严谨
+
+  // 1. 使用 Ref 同步脚本内容，避免闭包陷阱
+  const scriptRef = useRef('');
+  const timerRef = useRef<number | null>(null);
+
+  // 2. 加载逻辑只负责读文件
+  useEffect(() => {
+    if (type !== "player") return;
+    
+    const load = async () => {
+      try {
+        const [{ localUri }] = await Asset.loadAsync(require('../assets/sources/config_scripts.js.txt'));
+        if (localUri) {
+          const content = await FileSystem.readAsStringAsync(localUri);
+          setScript(content);
+          scriptRef.current = content; // 同步到 Ref
+        }
+      } catch (e) { console.error(e); }
+    };
+    load();
+  }, [type]);
+
+  // 3. 独立管理定时器
+  useEffect(() => {
+    if (type === "player") {
+      timerRef.current = setInterval(() => {
+        if (scriptRef.current) {
+          webRef.current?.injectJavaScript(scriptRef.current);
+        }
+      }, 2000);
     }
-    loadInternalScript();
-  }, []);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [type]);
 
   const handleMessage = useCallback(async (event: any) => {
     let data: any = null;
@@ -210,7 +254,7 @@ export default function WebviewScreen() {
             setErrorText(e?.nativeEvent?.description ?? '页面加载失败');
             setTitle('加载失败');
           }}
-          injectedJavaScript={script}
+          injectedJavaScript={fullScreenScript}
           onMessage={handleMessage}
           // 常用配置
           javaScriptEnabled

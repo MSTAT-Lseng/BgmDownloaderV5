@@ -1,0 +1,49 @@
+// 屏幕旋转
+(function () {
+  function isFullscreen() {
+    return !!(document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement);
+  }
+
+  function post(type) {
+    try {
+      window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
+        JSON.stringify({ type: type, fullscreen: isFullscreen() })
+      );
+    } catch (e) {}
+  }
+
+  // 1) 标准/前缀全屏变化事件
+  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"].forEach(function (evt) {
+    document.addEventListener(evt, function () {
+      post(isFullscreen() ? "enter_fullscreen" : "exit_fullscreen");
+    }, true);
+  });
+
+  // 2) 兼容 iOS <video> 的全屏事件（部分页面/系统才会触发）
+  document.addEventListener("webkitbeginfullscreen", function () {
+    post("enter_fullscreen");
+  }, true);
+
+  document.addEventListener("webkitendfullscreen", function () {
+    post("exit_fullscreen");
+  }, true);
+
+  // 3) 可选：监听 video play/pause（不等同全屏，只是备用信息）
+  document.addEventListener("play", function (e) {
+    if (e && e.target && e.target.tagName === "VIDEO") post("video_play");
+  }, true);
+
+  document.addEventListener("pause", function (e) {
+    if (e && e.target && e.target.tagName === "VIDEO") post("video_pause");
+  }, true);
+
+  post("bridge_ready");
+})();
+
+// iOS
+window.ReactNativeWebView.postMessage('hello');
+
+true;

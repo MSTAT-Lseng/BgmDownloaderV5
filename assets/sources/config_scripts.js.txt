@@ -1,3 +1,4 @@
+try{
 const regex_module = {
 
     // ID: 1
@@ -41,112 +42,154 @@ const regex_module = {
         ".fun.flex.between.box.radius",
         ".wap-diy-vod-a-box.tim-box"
       ],
-    }
+    },
 
+    // ID: 4
+    // 搜索页
+    "anime7\\.top\\\/vod-search\\\/(?:\\?wd=|page\\\/)": {
+      "hidden_elements": [
+        ".adsbygoogle",
+        "#conch-header",
+        ".hl-ctwrap-item.hl-conch-items.hl-search-items",
+        ".conch-ads-box.hl-this-box.hl-row-box.clearfix",
+        ".hl-rb-title.hl-site-tabs.hl-site-tits.hl-text-site",
+        ".conch-footwrap.hl-bg-subs.hl-footnav-show"
+      ],
+      "custom_css": {
+        ".conch-content.hl-row-box": {
+          "margin-bottom": "0"
+        },
+        "body": {
+          "padding-top": "0"
+        }
+      }
+    },
+    // 详情页
+    "anime7\\.top\\\/vod-detail\\\/": {
+      "hidden_elements": [
+        ".adsbygoogle",
+        "#conch-header",
+        ".conch-ads-box.hl-this-box.hl-row-box.clearfix",
+        ".hl-row-box.hl-rb-relvod.clearfix|0",
+        ".hl-row-box.hl-rb-relart.clearfix|0",
+        ".hl-foot-nav.hl-bg-site.hl-hide-sm"
+      ],
+      "custom_css": {
+        "body": {
+          "padding-top": "0"
+        }
+      }
+    },
+    // 播放页
+    "anime7\\.top\\\/vod-play\\\/": {
+      "hidden_elements": [
+        ".adsbygoogle",
+        "#conch-header",
+        ".hl-setups-wrap-2",
+        "#ad1002",
+        "#ad1007",
+        ".hl-infos-content.clearfix",
+        ".hl-row-box.hl-rb-relvod.clearfix",
+        ".hl-row-box.hl-rb-relart.clearfix",
+        ".hl-row-box.hl-rb-comm.clearfix",
+        "#conch-footer",
+        ".hl-foot-nav.hl-bg-site.hl-hide-sm"
+      ],
+      "custom_css": {
+        ".hl-col-xs-12.hl-playinfo-wrap": {
+          "padding-top": "18px"
+        },
+        "body": {
+          "padding-top": "0"
+        }
+      }
+    },
+
+    // ID: 5
+    "jcydmz\\.com\\\/index\\.php\\\/vod\\\/search(\\.html\\?wd=|\\\/page\\\/)": {
+      "hidden_elements": [
+        ".header.head-wrapper",
+        ".head-placeholder.gap",
+        "#app-download",
+        ".bottom"
+      ]
+    },
+    "www\\.jcydmz\\.com\\\/index\\.php\\\/vod\\\/detail\\/id": {
+      "hidden_elements": [
+        ".header.head-wrapper",
+        ".head-placeholder.gap",
+        "#app-download",
+        ".vod-list.layout-box.gap.pb-0",
+        ".bottom"
+      ]
+    },
+    "www\\.jcydmz\\.com\\\/index\\.php\\\/vod\\\/play\\\/id": {
+      "hidden_elements": [
+        ".header.head-wrapper",
+        ".head-placeholder.gap",
+        ".vod-list.layout-box.gap.pb-0",
+        "#app-download",
+        ".bottom"
+      ]
+    }
+    
 }
 
-function regexModuleRunner(config, targetStr = window.location.href) {
-  Object.keys(config).forEach(pattern => {
-    const regex = new RegExp(pattern);
+Object.keys(regex_module).forEach(pattern => {
+  const regex = new RegExp(pattern);
     
-    // 1. 检查正则是否匹配
-    if (regex.test(targetStr)) {
+  // 1. 检查正则是否匹配
+  if (regex.test(window.location.href)) {
 
-      // hidden elements
-      if (config[pattern].hasOwnProperty('hidden_elements')) {
-        const hidden_elements = config[pattern].hidden_elements;
+    // hidden elements
+    if (regex_module[pattern].hasOwnProperty('hidden_elements')) {
+      const hidden_elements = regex_module[pattern].hidden_elements;
         
-        // 遍历并执行 display: none
-        hidden_elements.forEach(selector => {
-          try {
-            if (selector.includes('|')) {
-              const [_selector, index] = selector.split('|');
-              const elements = document.querySelectorAll(_selector);
-              const targetIndex = parseInt(index);
+      // 遍历并执行 display: none
+      hidden_elements.forEach(selector => {
+        try {
+          if (selector.includes('|')) {
+            const [_selector, index] = selector.split('|');
+            const elements = document.querySelectorAll(_selector);
+            const targetIndex = parseInt(index);
 
-              // 检查元素是否存在且索引有效
-              if (elements[targetIndex]) {
-                elements[targetIndex].style.display = 'none';
-              }
-            } else {
-              const elements = document.querySelectorAll(selector);
-              elements.forEach(el => {
-                el.style.display = 'none';
-              });
+            // 检查元素是否存在且索引有效
+            if (elements[targetIndex]) {
+              elements[targetIndex].style.display = 'none';
             }
-          } catch (error) {
-            console.error(`无法处理选择器 "${selector}":`, error);
+          } else {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+              el.style.display = 'none';
+            });
           }
-        });
-      }
+        } catch (error) {
+          console.error(`无法处理选择器 "${selector}":`, error);
+        }
+      });
+    }
       
-      // custom css
-      if (config[pattern].hasOwnProperty('custom_css')) {
-        const custom_css = config[pattern].custom_css;
+    // custom css
+    if (regex_module[pattern].hasOwnProperty('custom_css')) {
+      const custom_css = regex_module[pattern].custom_css;
         
-        // 遍历并执行 custom_css
-        Object.keys(custom_css).forEach(selector => {
-          document.querySelectorAll(selector).forEach(el => {
-            Object.keys(custom_css[selector]).forEach(property => {
-              el.style[property] = custom_css[selector][property];
-            })
+      // 遍历并执行 custom_css
+      Object.keys(custom_css).forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+          Object.keys(custom_css[selector]).forEach(property => {
+            el.style[property] = custom_css[selector][property];
           })
         })
-      }
-      
+      })
     }
-  });
-}
+      
+  }
+});
 
-// 执行解析
-regexModuleRunner(regex_module);
+} catch (error) {}
+
 
 // iOS
 window.ReactNativeWebView.postMessage('hello');
-
-// 屏幕旋转
-(function () {
-  function isFullscreen() {
-    return !!(document.fullscreenElement ||
-      document.webkitFullscreenElement ||
-      document.mozFullScreenElement ||
-      document.msFullscreenElement);
-  }
-
-  function post(type) {
-    try {
-      window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
-        JSON.stringify({ type: type, fullscreen: isFullscreen() })
-      );
-    } catch (e) {}
-  }
-
-  // 1) 标准/前缀全屏变化事件
-  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"].forEach(function (evt) {
-    document.addEventListener(evt, function () {
-      post(isFullscreen() ? "enter_fullscreen" : "exit_fullscreen");
-    }, true);
-  });
-
-  // 2) 兼容 iOS <video> 的全屏事件（部分页面/系统才会触发）
-  document.addEventListener("webkitbeginfullscreen", function () {
-    post("enter_fullscreen");
-  }, true);
-
-  document.addEventListener("webkitendfullscreen", function () {
-    post("exit_fullscreen");
-  }, true);
-
-  // 3) 可选：监听 video play/pause（不等同全屏，只是备用信息）
-  document.addEventListener("play", function (e) {
-    if (e && e.target && e.target.tagName === "VIDEO") post("video_play");
-  }, true);
-
-  document.addEventListener("pause", function (e) {
-    if (e && e.target && e.target.tagName === "VIDEO") post("video_pause");
-  }, true);
-
-  post("bridge_ready");
-})();
 
 true;

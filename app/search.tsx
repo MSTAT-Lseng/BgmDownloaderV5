@@ -145,13 +145,18 @@ export default function SearchScreen() {
     while ((match = regex.exec(html)) !== null) {
       // 根据 config 中定义的 match_index 提取数据
       // 注意：match[0] 是完整匹配，group 从 1 开始
-      const image = match[fields.image.match_index] || "";
+      let image = match[fields.image.match_index] || "";
       const url = match[fields.url.match_index] || "";
       let title = match[fields.title.match_index] || "";
 
       // ID 18 特殊处理，其标签含有 span。
       if (title.includes("<span")) {
         title = title.replace(/<\/?span[^>]*>/g, '');
+      }
+
+      // image 特殊处理：如果 image 是绝对路径要加域名
+      if (image.startsWith('/')) {
+        image = host + image;
       }
 
       if (title && url) {
