@@ -2,7 +2,7 @@
   "expo": {
     "name": "番剧下载",
     "slug": "BgmDownloaderV5",
-    "version": "5.0.0",
+    "version": "5.0.1",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "bgmdownloaderv5",
