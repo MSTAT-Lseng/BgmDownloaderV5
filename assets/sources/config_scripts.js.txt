@@ -131,6 +131,95 @@ const regex_module = {
         "#app-download",
         ".bottom"
       ]
+    },
+
+    // ID: 6
+    "yinghuadm\\.cn\\\/search_": {
+      "hidden_elements": [
+        ".sidebar",
+        ".mxprofoot"
+      ],
+      "custom_css": {
+        ".main": {
+          "padding-top": "0"
+        }
+      }
+    },
+    "yinghuadm\\.cn\\\/vod_": {
+      "hidden_elements": [
+        ".mxprofoot",
+        ".sidebar",
+        "body>div"
+      ],
+      "custom_css": {
+        ".page.view": {
+          "display": "block",
+          "position": "relative",
+          "z-index": "999999999999",
+          "background": "#f5f6f7",
+          "margin-bottom": "-250px"
+        }
+      }
+    },
+    "yinghuadm\\.cn\\\/yinghua_": {
+      "hidden_elements": [
+        ".mxprofoot",
+        ".sidebar",
+        "body>div"
+      ],
+      "custom_css": {
+        ".page.player": {
+          "display": "block",
+          "position": "relative",
+          "z-index": "999999999999",
+          "background": "#f5f6f7",
+          "margin-bottom": "-250px"
+        },
+        ".main": {
+          "padding-top": "0"
+        }
+      }
+    },
+
+    // ID: 7
+    "www\\.aafun\\.cc\\\/feng-s(\\.html\\?wd=|\\\/page\\\/)": {
+      "hidden_elements": [
+        ".conch-headwrap.conch-hasconch",
+        ".hl-ctwrap-item.hl-conch-items.hl-search-items",
+        ".hl-foot-nav.hl-bg-site.hl-hide-sm",
+        "#ad1007",
+        ".footer-DuanLuo.container",
+        ".hl-foot-extra"
+      ],
+      "custom_css": {
+        ".hl-rb-title.hl-site-tits": {
+          "padding-top": "16px"
+        },
+        ".hl-rb-head.hl-head-page.clearfix": {
+          "padding-right": "14px"
+        }
+      }
+    },
+    "www\\.aafun\\.cc\\\/feng-n\\\/": {
+      "hidden_elements": [
+        ".conch-header",
+        ".hl-foot-extra",
+        "#ad1007",
+        ".footer-DuanLuo.container",
+        ".hl-foot-nav.hl-bg-site.hl-hide-sm",
+        ".hl-row-box.hl-rb-relvod.clearfix"
+      ]
+    },
+    "www\\.aafun\\.cc\\\/f\\\/": {
+      "hidden_elements": [
+        ".conch-header",
+        ".hl-fe-list.clearfix",
+        ".hl-tag-item.clearfix",
+        ".hl-foot-nav.hl-bg-site.hl-hide-sm",
+        "#ad1007",
+        "#playrelated",
+        ".footer-DuanLuo.container"
+      ]
     }
     
 }

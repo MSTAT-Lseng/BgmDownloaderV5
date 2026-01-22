@@ -227,9 +227,19 @@ export default function WebviewScreen() {
           source={{ uri: webUrl }}
           // 核心：强制所有链接在当前 WebView 中打开
           onShouldStartLoadWithRequest={(request) => {
-            // 允许加载所有 http 和 https 链接
-            if (request.url.startsWith('http')) {
-              return true; 
+            // 如果是 player，只允许加载规则内的 host，防止广告跳转。
+            if (type === "player") {
+              let domain = webUrl.split('/')[2];
+              if (request.url.includes(domain)) {
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              // 允许加载所有 http 和 https 链接
+              if (request.url.startsWith('http')) {
+                return true; 
+              }
             }
             // 可以在这里处理其他协议，如 tel: 或 mailto:
             return false;
