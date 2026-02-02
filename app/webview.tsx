@@ -153,8 +153,15 @@ export default function WebviewScreen() {
     }
 
     // 异步检查前，可以根据需要决定是否重置（推荐重置，避免旧页面的状态残留）
+    try {
+    // 确保表已创建
+    await FavoritesDB.init(); 
+    
     const exists = await FavoritesDB.exists(url);
-    setIsFavorite(exists);
+      setIsFavorite(exists);
+    } catch (e) {
+      console.error("检查收藏状态失败:", e);
+    }
   }, [type]); // 注意：这里依赖项应包含 type (你代码中是 types，请统一变量名)
 
   // 监听 currentUrl 的变化

@@ -2,7 +2,7 @@
   "search_config": {
     "url": "{host}/s----------.html?wd={q}",
     "details_format": "{host}{result}",
-    "item_regex": "data-bg=\"([^\"]+)\"[\\s\\S]*?class=\"title\" href=\"([^\"]+)\" title=\"([^\"]+)\"",
+    "item_regex": "data-bg=\"([^\"]+)\".*?href=\"([^\"]+)\".*?title=\"([^\"]+)\"",
     "fields": {
       "url": {
         "match_index": 2,

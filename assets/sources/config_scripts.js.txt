@@ -220,6 +220,61 @@ const regex_module = {
         "#playrelated",
         ".footer-DuanLuo.container"
       ]
+    },
+
+    // ID: 9
+    "www\\.mwcy\\.net\\\/(search\\.html\\?wd=|search\\\/page\\\/)": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".foot-table-box",
+        ".footer-bottom",
+        ".m-search"
+      ]
+    },
+    "www\\.mwcy\\.net\\\/bangumi\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".box-width.ec-tutu.ec-tutu-double.flex",
+        ".foot-table-box",
+        ".footer-bottom",
+        ".box-width.wow.fadeInUp.animated"
+      ]
+    },
+    "www\\.mwcy\\.net\\\/play\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".foot-table-box",
+        ".box-width.ec-tutu.ec-tutu-double.flex",
+        ".box-width.wow.fadeInUp.animated",
+        ".footer-bottom"
+      ]
+    },
+
+    // ID: 10
+    "dm\\.xifanacg\\.com\\\/(search\\.html\\?wd=|search\\\/wd\\\/)": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".foot-table-box",
+        ".m-search",
+        "#app-promo-modal"
+      ]
+    },
+    "dm\\.xifanacg\\.com\\\/bangumi\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".foot-table-box",
+        ".box-width.wow.fadeInUp.animated",
+        "#app-promo-modal"
+      ]
+    },
+    "dm\\.xifanacg\\.com\\\/watch\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".foot-table-box",
+        ".box-width.wow.fadeInUp.animated",
+        "#app-promo-modal",
+        ".box-width.ec-tutu.ec-tutu-double.flex"
+      ]
     }
     
 }
