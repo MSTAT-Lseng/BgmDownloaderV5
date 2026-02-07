@@ -2,6 +2,8 @@
 
 本项目是番剧下载系列V1-V3版本的继承。使用 React Native 框架 [Expo](https://expo.dev) 编写。兼容 Android 与 iOS 平台。 [进入下载页面>>](https://mstat.top/bgm_downloader)
 
+*旧版本 V1-V3 存档仓库 [点击进入>>](https://github.com/MSTAT-Lseng/bgmdown_android)*
+
 ## 项目截图
 
 <img src="https://s2.loli.net/2026/01/17/5AuHrRG1nvmcs7X.png" width="200" /> <img src="https://s2.loli.net/2026/01/17/uvesHo85SgWGEDj.png" width="200" /> <img src="https://s2.loli.net/2026/01/17/k546CjJtUw7KRZa.png" width="200" />
