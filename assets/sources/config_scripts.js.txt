@@ -275,6 +275,62 @@ const regex_module = {
         "#app-promo-modal",
         ".box-width.ec-tutu.ec-tutu-double.flex"
       ]
+    },
+
+
+    // ID: 11
+    "dmbus\\.cc\\\/s-": {
+      "hidden_elements": [
+        "#mask",
+        ".notice_box",
+        ".header",
+        ".nav"
+      ],
+      "custom_css": {
+        ".container": {
+          "z-index": "9999999999",
+          "margin-bottom": "-150px"
+        },
+        ".card.mb20": {
+          "padding-top": "20px"
+        }
+      }
+    },
+    "dmbus\\.cc\\\/v\\\/": {
+      "hidden_elements": [
+        "#mask",
+        ".notice_box",
+        ".header",
+        ".nav",
+        "li.more"
+      ],
+      "custom_css": {
+        ".container": {
+          "z-index": "9999999999",
+          "margin-bottom": "-150px"
+        },
+        ".card.mb20": {
+          "padding-top": "20px"
+        }
+      }
+    },
+    "dmbus\\.cc\\\/p\\\/": {
+      "hidden_elements": [
+        "#mask",
+        ".notice_box",
+        ".header",
+        ".nav",
+        "li.more"
+      ],
+      "custom_css": {
+        ".container": {
+          "z-index": "9999999999",
+          "margin-bottom": "-150px"
+        },
+        ".card.mb20": {
+          "padding-top": "20px"
+        }
+      }
     }
     
 }

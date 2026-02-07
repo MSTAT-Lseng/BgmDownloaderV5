@@ -84,7 +84,11 @@ export default function SearchScreen() {
           .replace("{host}", source.url);
 
         const response = await fetch(searchUrl, { 
-          headers: { "User-Agent": userAgent },
+          headers: { 
+            "User-Agent": userAgent, 
+            "Priority": "u=3, i", 
+            "Accept-Language": "zh-CN,zh-Hans;q=0.9"
+          },
           signal: controller.signal, // 2. 绑定信号
         });
         
