@@ -1,50 +1,50 @@
-# Welcome to your Expo app 👋
+# BgmDownloaderV5
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+本项目是番剧下载系列V1-V3版本的继承。使用 React Native 框架 [Expo](https://expo.dev) 编写。兼容 Android 与 iOS 平台。 [进入下载页面>>](https://mstat.top/bgm_downloader)
 
-## Get started
+## 项目截图
 
-1. Install dependencies
+<img src="https://s2.loli.net/2026/01/17/5AuHrRG1nvmcs7X.png" width="200" /> <img src="https://s2.loli.net/2026/01/17/uvesHo85SgWGEDj.png" width="200" /> <img src="https://s2.loli.net/2026/01/17/k546CjJtUw7KRZa.png" width="200" />
+
+<img src="https://s2.loli.net/2026/01/17/rx23dsKXFCNeAbY.png" width="200" /> <img src="https://s2.loli.net/2026/01/17/aYfpiEMJIs1HR35.png" width="200" /> <img src="https://s2.loli.net/2026/01/17/YK5rFLHEoDU8Sqm.png" width="200" />
+
+
+## 开始使用
+
+1. 安装依赖项
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. 启动App
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+在输出结果中，您可以找到以下选项来打开应用：
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- [开发版本](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android 模拟器](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS 模拟器](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), 一个用于尝试使用 Expo 进行应用开发的受限沙箱环境
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+您可以通过编辑 **app** 目录中的文件来开始开发。本项目使用 [基于文件的路由](https://docs.expo.dev/router/introduction)。
 
-## Get a fresh project
+## 获取一个新项目
 
-When you're ready, run:
+准备就绪后，运行：
 
 ```bash
 npm run reset-project
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+此命令会将初始代码移动到 **app-example** 目录，并创建一个空白的 **app** 目录，您可以在其中开始开发。
 
-## Learn more
+## 了解更多
 
-To learn more about developing your project with Expo, look at the following resources:
+要了解更多关于使用 Expo 开发项目的信息，请查看以下资源：
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [Expo 文档](https://docs.expo.dev/): 学习基础知识，或通过我们的 [指南](https://docs.expo.dev/guides) 深入学习高级主题。
+- [Expo 入门教程](https://docs.expo.dev/tutorial/introduction/): 跟随分步教程，创建一个可在 Android、iOS 和 Web 上运行的项目。
