@@ -331,6 +331,29 @@ const regex_module = {
           "padding-top": "20px"
         }
       }
+    },
+
+    // ID: 12
+    "bgm\\.girigirilove\\.com\\\/search\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".m-search",
+        "#notice"
+      ]
+    },
+    "bgm\\.girigirilove\\.com\\\/GV": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".box-width.ec-tutu.ec-tutu-double.flex",
+        "#notice"
+      ]
+    },
+    "bgm\\.girigirilove\\.com\\\/play": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".ec-tutu",
+        "#notice"
+      ]
     }
     
 }
