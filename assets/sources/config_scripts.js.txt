@@ -354,6 +354,32 @@ const regex_module = {
         ".ec-tutu",
         "#notice"
       ]
+    },
+
+    // ID: 14
+    "www\\.gugu3\\.com\\\/index\\.php\\\/vod\\\/search": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".m-search",
+        "#notice",
+        ".foot-table-box"
+      ]
+    },
+    "www\\.gugu3\\.com\\\/index\\.php\\\/vod\\\/detail\\\/id\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".foot-table-box",
+        "#notice",
+        ".box-width.ec-tutu.ec-tutu-double.flex"
+      ]
+    },
+    "www\\.gugu3\\.com\\\/index\\.php\\\/vod\\\/play\\\/id\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
+        ".foot-table-box",
+        "#notice",
+        ".none.tutu-margins.top5.top40"
+      ]
     }
     
 }
