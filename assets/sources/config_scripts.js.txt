@@ -435,6 +435,14 @@ const regex_module = {
           "background": "#f5f5f5"
         }
       }
+    },
+
+    // ID: 24
+    "m\\.agedm\\.io": {
+      "hidden_elements": [
+        ".container.head-container",
+        ".van-hairline--top.van-tabbar.van-tabbar--fixed"
+      ]
     }
     
 }

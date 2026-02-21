@@ -237,7 +237,7 @@ export default function WebviewScreen() {
             // 如果是 player，只允许加载规则内的 host，防止广告跳转。
             if (type === "player") {
               let domain = webUrl.split('/')[2];
-              if (request.url.includes(domain)) {
+              if (request.url.includes(domain) || request.url.includes(domain.replace("www.", "m."))) {
                 return true;
               } else {
                 return false;
