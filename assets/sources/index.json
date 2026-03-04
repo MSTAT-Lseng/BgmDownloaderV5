@@ -15,7 +15,7 @@
     "desc": null,
     "icon": "dalvdm",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 3,
@@ -50,8 +50,8 @@
     "url": "https://yinghuadm.cn",
     "desc": null,
     "icon": "yinghuadm",
-    "enabled": true,
-    "adaptation": true
+    "enabled": false,
+    "adaptation": false
   },
   {
     "id": 7,
@@ -140,8 +140,8 @@
     "url": "https://www.mxdm.xyz",
     "desc": "有广告，视频高清。",
     "icon": "mxdm",
-    "enabled": true,
-    "adaptation": true
+    "enabled": false,
+    "adaptation": false
   },
   {
     "id": 17,
@@ -185,8 +185,8 @@
     "url": "https://www.706dm.com",
     "desc": "有广告，视频清晰。",
     "icon": "706dm",
-    "enabled": true,
-    "adaptation": true
+    "enabled": false,
+    "adaptation": false
   },
   {
     "id": 22,

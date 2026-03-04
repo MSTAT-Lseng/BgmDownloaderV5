@@ -2,6 +2,7 @@
   "search_config": {
     "url": "{host}/search/-------------/?wd={q}",
     "details_format": "{host}{result}",
+    "cookie": "_ga=GA1.1.2115694592.1768352522; ds_notice=1; PHPSESSID=v486nrdipj88eifo0qnnkn62ba; _ga_B2C22CJL17=GS2.1.s1772587427$o7$g1$t1772587432$j55$l0$h0",
     "item_regex": "<div\\s+class=\"vod-detail\\s+style-detail\\s+cor4\\s+search-list\"[\\s\\S]*?<img[^>]*\\bdata-src=\"([^\"]+)\"[^>]*>[\\s\\S]*?<a[^>]*href=\"([^\"]+)\"[^>]*>[\\s\\S]*?<h3[^>]*class=\"slide-info-title[^\"]*\"[^>]*>\\s*([^<]+?)\\s*<\\/h3>[\\s\\S]*?<\\/div>\\s*<\\/div>\\s*<\\/div>\\s*<\\/div>",
     "fields": {
       "url": {

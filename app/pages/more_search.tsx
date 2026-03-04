@@ -48,7 +48,7 @@ function getIcon(iconName: string) {
 
 export default function searchArchiveScreen() {
   const navigation = useNavigation();
-  const data = (sources as SourceItem[]).filter(item => !item.adaptation);
+  const data = (sources as SourceItem[]).filter(item => item.adaptation === false && item.enabled === true);
   const router = useRouter();
 
   const renderItem = ({ item }: { item: SourceItem }) => (

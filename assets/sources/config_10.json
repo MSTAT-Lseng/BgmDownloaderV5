@@ -2,6 +2,7 @@
   "search_config": {
     "url": "{host}/search.html?wd={q}",
     "details_format": "{host}{result}",
+    "cookie": "ds_notice=1; PHPSESSID=3b1aanko9shn9uf7kf06oekmqo; __51uvsct__JmrbEK9F16hDQiud=1; __51vcke__JmrbEK9F16hDQiud=484b7184-38e9-5e6c-9059-460db1cc1d60; __51vuft__JmrbEK9F16hDQiud=1772585333766; __vtins__JmrbEK9F16hDQiud=%7B%22sid%22%3A%20%22a2dd6810-9dfd-53fd-bb22-109b692c9aa7%22%2C%20%22vd%22%3A%203%2C%20%22stt%22%3A%2048586%2C%20%22dr%22%3A%2028783%2C%20%22expires%22%3A%201772587182349%2C%20%22ct%22%3A%201772585382349%7D",
     "item_regex": "<div\\s+class=\"vod-detail\\s+style-detail\\s+cor4\\s+search-list\"[\\s\\S]*?<img[^>]*\\bdata-src=\"([^\"]+)\"[^>]*>[\\s\\S]*?<a[^>]*href=\"([^\"]+)\"[^>]*>[\\s\\S]*?<h3[^>]*class=\"slide-info-title[^\"]*\"[^>]*>\\s*([^<]+?)\\s*<\\/h3>[\\s\\S]*?<\\/div>\\s*<\\/div>\\s*<\\/div>\\s*<\\/div>",
     "fields": {
       "url": {

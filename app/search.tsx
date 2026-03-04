@@ -18,6 +18,7 @@ import sourceIndex from "../assets/sources/index.json";
 // 由于 RN 不支持动态 require，需手动建立映射)
 const sourceConfigs: Record<number, any> = {
   1: require(`${SOURCES_DIR}/config_1.json`),
+  2: require(`${SOURCES_DIR}/config_2.json`),
   4: require(`${SOURCES_DIR}/config_4.json`),
   5: require(`${SOURCES_DIR}/config_5.json`),
   6: require(`${SOURCES_DIR}/config_6.json`),
@@ -79,6 +80,8 @@ export default function SearchScreen() {
 
       try {
         const { search_config } = config;
+        const { cookie } = search_config;
+
         const searchUrl = search_config.url
           .replace("{q}", encodeURIComponent(keyword))
           .replace("{host}", source.url);
@@ -87,8 +90,10 @@ export default function SearchScreen() {
           headers: { 
             "User-Agent": userAgent, 
             "Priority": "u=3, i", 
-            "Accept-Language": "zh-CN,zh-Hans;q=0.9"
+            "Accept-Language": "zh-CN,zh-Hans;q=0.9",
+            ...(cookie ? { "Cookie": cookie } : {})
           },
+          credentials: 'omit', // 强制忽略本地 Cookie 池，确保只发送 Header 中定义的 Cookie
           signal: controller.signal, // 2. 绑定信号
         });
         
