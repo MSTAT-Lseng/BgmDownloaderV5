@@ -1,5 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Svg, { Circle, Path } from "react-native-svg";
+import { decodeHtmlEntities } from "@/src/utils/html";
 import {
   ActivityIndicator,
   Alert,
@@ -126,7 +128,21 @@ export default function HomeScreen() {
       const cleaned = json
         .map((d) => ({
           ...d,
-          items: Array.isArray(d.items) ? d.items.filter(Boolean) : [],
+          // 接口里的 `&amp;`、`&quot;` 等实体需要解码后再展示 / 搜索
+          weekday: d.weekday && {
+            ...d.weekday,
+            cn: decodeHtmlEntities(d.weekday.cn),
+            en: decodeHtmlEntities(d.weekday.en),
+            ja: decodeHtmlEntities(d.weekday.ja),
+          },
+          items: Array.isArray(d.items)
+            ? d.items.filter(Boolean).map((item) => ({
+                ...item,
+                name: decodeHtmlEntities(item.name),
+                name_cn: decodeHtmlEntities(item.name_cn),
+                summary: decodeHtmlEntities(item.summary),
+              }))
+            : [],
         }))
         .filter((d) => d.weekday && typeof d.weekday.id === "number")
         .sort((a, b) => {
@@ -211,10 +227,31 @@ export default function HomeScreen() {
 
     <View style={styles.searchWrap}>
       <View style={styles.searchBox}>
+        <Svg
+          width={18}
+          height={18}
+          viewBox="0 0 24 24"
+          fill="none"
+          style={styles.searchIcon}
+        >
+          <Circle
+            cx={11}
+            cy={11}
+            r={7}
+            stroke="#667085"
+            strokeWidth={2}
+          />
+          <Path
+            d="M20 20l-4-4"
+            stroke="#667085"
+            strokeWidth={2}
+            strokeLinecap="round"
+          />
+        </Svg>
         <TextInput
           value={query}
           onChangeText={setQuery}
-          placeholder="🔍 搜索番剧..."
+          placeholder="搜索番剧..."
           placeholderTextColor="#667085"
           style={styles.searchInput}
           clearButtonMode="while-editing"
@@ -444,15 +481,24 @@ const styles = StyleSheet.create({
   },
 
   searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
     borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.06)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.10)",
   },
 
+  searchIcon: {
+    marginRight: 8,
+  },
+
   searchInput: {
+    flex: 1,
     height: 40,
-    paddingHorizontal: 12,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
     color: "#E9EDF5",
     fontSize: 14,
   },
