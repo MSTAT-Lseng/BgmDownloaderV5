@@ -40,7 +40,7 @@ export default function AboutScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" translucent={true} />
+      <StatusBar style="light" />
       <AppHeader title={"关于"} showBack={true} onBackPress={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

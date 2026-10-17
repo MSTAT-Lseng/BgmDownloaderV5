@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "bgmdownloaderv5",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "backgroundColor": "#000000",
     "ios": {
       "supportsTablet": true,
@@ -22,7 +21,6 @@
     },
     "android": {
       "icon": "./assets/images/icon.png",
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "m20.bgm.downloader.v5",
       "backgroundColor": "#000000",
@@ -54,7 +52,8 @@
           }
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,

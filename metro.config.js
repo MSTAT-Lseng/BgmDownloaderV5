@@ -15,6 +15,8 @@ module.exports = (() => {
   };
 
   config.resolver.assetExts.push('txt');
+  // expo-sqlite 的 Web 实现依赖 wa-sqlite 的 .wasm 资源（SDK 55+ 起需要）
+  config.resolver.assetExts.push('wasm');
 
   return config;
 })();

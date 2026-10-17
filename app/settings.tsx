@@ -64,7 +64,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" translucent={true} />
+      <StatusBar style="light" />
       <AppHeader title={"设置"} showBack={true} onBackPress={() => navigation.goBack()} />
 
       <View style={styles.content}>

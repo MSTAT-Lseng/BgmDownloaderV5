@@ -189,7 +189,7 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" translucent={true} />
+      <StatusBar style="light" />
       <AppHeader title={q ? `搜索: ${q}` : "搜索"} showBack={true} 
         onBackPress={() => navigation.goBack()}
         icon={<Ionicons name="albums-outline" size={24} color="#EAF0FF" />}
@@ -201,7 +201,7 @@ export default function SearchScreen() {
         keyExtractor={(item) => item.sourceName}
         contentContainerStyle={styles.listContent}
         // 只有当加载结束且真的没数据时才显示“未找到”
-        ListEmptyComponent={!loading ? <Text style={styles.empty}>未找到相关内容</Text> : null}
+        ListEmptyComponent={!loading ? <Text style={styles.empty}>未找到相关内容</Text> : undefined}
         renderItem={({ item }) => (
           <View style={styles.sourceSection}>
             <View style={styles.sourceInfo}>
@@ -255,7 +255,11 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject, // 铺满全屏
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0, // 铺满全屏（RN 0.88 移除了 StyleSheet.absoluteFillObject）
     backgroundColor: 'rgba(5, 7, 12, 0.7)', // 半透明背景
     justifyContent: 'center',
     alignItems: 'center',

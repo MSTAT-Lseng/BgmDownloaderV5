@@ -10,8 +10,7 @@ import StarIcon from "@/assets/icons/star.svg";
 import CalendarIcon from "../../assets/icons/calendar.svg";
 
 import { AppHeader } from "@/components/app-header";
-import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect } from 'react';
+import { NavigationBar } from 'expo-navigation-bar';
 
 import { Ionicons } from "@expo/vector-icons"; // Expo 内置图标库
 
@@ -41,13 +40,6 @@ function TabItem({
 }
 
 export default function TabsLayout() {
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync('#090C13');
-      NavigationBar.setButtonStyleAsync('light');
-    }
-  }, []);
-
   const segments = useSegments();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -63,7 +55,9 @@ export default function TabsLayout() {
 
   return (
     <View style={styles.page}>
-      <StatusBar style="light" translucent={true} />
+      <StatusBar style="light" />
+      {/* SDK 58：导航栏改为声明式配置，背景色随 edge-to-edge 透明，仅设置图标明暗 */}
+      {Platform.OS === 'android' && <NavigationBar style="dark" />}
       <AppHeader title={title}
         icon={<Ionicons name="settings-outline" size={24} color="#EAF0FF" />} 
         onIconPress={() => router.push({

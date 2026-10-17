@@ -11,6 +11,27 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
+/**
+ * react-native-webview 14 的 .d.ts 只把组件声明成 FunctionComponent（漏了 forwardRef），
+ * 但其源码实际用 forwardRef + useImperativeHandle 暴露了下列命令式方法，这里按真实形态补类型。
+ */
+type WebViewHandle = {
+  goForward: () => void;
+  goBack: () => void;
+  reload: () => void;
+  stopLoading: () => void;
+  postMessage: (data: string) => void;
+  injectJavaScript: (code: string) => void;
+  requestFocus: () => void;
+  clearFormData: () => void;
+  clearCache: (includeDiskFiles: boolean) => void;
+  clearHistory: () => void;
+};
+
+const WebViewWithRef = WebView as unknown as React.ComponentType<
+  React.ComponentProps<typeof WebView> & { ref?: React.Ref<WebViewHandle | null> }
+>;
+
 export default function WebviewScreen() {
   const navigation = useNavigation();
   const { url, type = 'default' /* 1. 接收 type 参数，默认为 'default'*/ } = useLocalSearchParams < {
@@ -24,7 +45,7 @@ export default function WebviewScreen() {
     return Array.isArray(url) ? url[0] : url;
   }, [url]);
 
-  const webRef = useRef < WebView > (null);
+  const webRef = useRef<WebViewHandle | null>(null);
 
   const [title, setTitle] = useState('加载中...');
   const [errorText, setErrorText] = useState < string | null > (null);
@@ -195,7 +216,7 @@ export default function WebviewScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" translucent />
+      <StatusBar style="light" />
 
       <AppHeader
         title={title}
@@ -229,7 +250,7 @@ export default function WebviewScreen() {
           </View>
         )}
 
-        <WebView
+        <WebViewWithRef
           ref={webRef}
           source={{ uri: webUrl }}
           // 核心：强制所有链接在当前 WebView 中打开
@@ -343,7 +364,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#05070C'
   },
   errorMask: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     paddingHorizontal: 18,
     alignItems: 'center',
     justifyContent: 'center',
