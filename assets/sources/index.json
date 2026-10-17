@@ -1,10 +1,10 @@
 [
   {
     "id": 1,
-    "name": "次元方舟",
-    "url": "https://www.cyfz.vip",
-    "desc": null,
-    "icon": "cyfz",
+    "name": "次元城动画",
+    "url": "https://www.cycani.org/",
+    "desc": "仅限国内IP使用",
+    "icon": "cycani",
     "enabled": true,
     "adaptation": true
   },

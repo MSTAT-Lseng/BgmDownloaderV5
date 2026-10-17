@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import React from "react";
 import {
   FlatList,
   Image,
@@ -15,7 +14,7 @@ import sources from "@/assets/sources/index.json";
 const SOURCES_PATH = "@/assets/icons/sources";
 // 2. 图标映射表（Expo 必须这样写）
 const iconMap: Record<string, any> = {
-  "cyfz": require(`${SOURCES_PATH}/cyfz.png`),
+  "cycani": require(`${SOURCES_PATH}/cycani.png`),
   "dalvdm": require(`${SOURCES_PATH}/dalvdm.png`),
   "animoe": require(`${SOURCES_PATH}/animoe.png`),
   "anime7": require(`${SOURCES_PATH}/anime7.png`),
@@ -43,6 +42,10 @@ const iconMap: Record<string, any> = {
 
 const defaultIcon = require(`${SOURCES_PATH}/default.png`);
 
+// 跳转 WebView 时附带的 User-Agent（伪装成 iPhone Safari，部分站点会按 UA 下发不同的播放页）
+const WEBVIEW_USER_AGENT =
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1";
+
 type SourceItem = {
   id: number;
   name: string;
@@ -67,7 +70,11 @@ export default function SourceScreen() {
       activeOpacity={0.8}
       onPress={() => router.push({
         pathname: "/webview",
-        params: { url: item.url, type: "sources" },
+        params: {
+          url: item.url,
+          type: "sources",
+          userAgent: WEBVIEW_USER_AGENT,
+        },
       })}
     >
       <Image

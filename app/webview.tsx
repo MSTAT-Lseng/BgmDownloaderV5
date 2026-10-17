@@ -34,9 +34,10 @@ const WebViewWithRef = WebView as unknown as React.ComponentType<
 
 export default function WebviewScreen() {
   const navigation = useNavigation();
-  const { url, type = 'default' /* 1. 接收 type 参数，默认为 'default'*/ } = useLocalSearchParams < {
+  const { url, type = 'default' /* 1. 接收 type 参数，默认为 'default'*/, userAgent /* 2. 接收上页传来的 UA */ } = useLocalSearchParams < {
     url ? : string,
     type ?: string;
+    userAgent ?: string;
   } > ();
 
   const webUrl = useMemo(() => {
@@ -44,6 +45,12 @@ export default function WebviewScreen() {
     if (!url) return '';
     return Array.isArray(url) ? url[0] : url;
   }, [url]);
+
+  // 未传 UA 时保持 WebView 默认 UA
+  const webUserAgent = useMemo(() => {
+    if (!userAgent) return undefined;
+    return Array.isArray(userAgent) ? userAgent[0] : userAgent;
+  }, [userAgent]);
 
   const webRef = useRef<WebViewHandle | null>(null);
 
@@ -253,6 +260,8 @@ export default function WebviewScreen() {
         <WebViewWithRef
           ref={webRef}
           source={{ uri: webUrl }}
+          // 应用来源页传入的 User-Agent（未传时使用 WebView 默认值）
+          userAgent={webUserAgent}
           // 核心：强制所有链接在当前 WebView 中打开
           onShouldStartLoadWithRequest={(request) => {
             // 如果是 player，只允许加载规则内的 host，防止广告跳转。
