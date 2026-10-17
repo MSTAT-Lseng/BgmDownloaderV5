@@ -45,9 +45,13 @@ interface SearchResult {
 interface GroupedResult {
   sourceName: string;
   sourceUrl: string;
-  searchUrl: string;
+  moreUrl: string;
   data: SearchResult[];
 }
+
+// 次元城（cycani）相关配置
+const CYCANI_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1";
+const isCycaniUrl = (url: string) => url.includes("cycani.org");
 
 export default function SearchScreen() {
   const { q } = useLocalSearchParams<{ q: string }>();
@@ -86,12 +90,21 @@ export default function SearchScreen() {
           .replace("{q}", encodeURIComponent(keyword))
           .replace("{host}", source.url);
 
+        // 次元城的搜索接口要求携带 x-app-name
+        const isCycani = isCycaniUrl(source.url);
+
+        // 次元城的“查看全部”跳转到分类页
+        const moreUrl = isCycani
+          ? `${source.url.replace(/\/+$/, "")}/category?q=${encodeURIComponent(keyword)}`
+          : searchUrl;
+
         const response = await fetch(searchUrl, { 
           headers: { 
             "User-Agent": userAgent, 
             "Priority": "u=3, i", 
             "Accept-Language": "zh-CN,zh-Hans;q=0.9",
-            ...(cookie ? { "Cookie": cookie } : {})
+            ...(cookie ? { "Cookie": cookie } : {}),
+            ...(isCycani ? { "x-app-name": "cyc_web" } : {})
           },
           credentials: 'omit', // 强制忽略本地 Cookie 池，确保只发送 Header 中定义的 Cookie
           signal: controller.signal, // 2. 绑定信号
@@ -105,7 +118,7 @@ export default function SearchScreen() {
 
         if (data.length > 0) {
           setResults(prev => [...prev, 
-            { sourceName: source.name, sourceUrl: source.url, data: data, searchUrl: searchUrl }
+            { sourceName: source.name, sourceUrl: source.url, data: data, moreUrl: moreUrl }
           ]);
         }
       } catch (err: any) {
@@ -136,6 +149,16 @@ export default function SearchScreen() {
     }
   };
 
+  // JSON 接口返回的字符串会带有转义（如封面地址中的 \u0026），需要还原
+  const decodeJsonEscapes = (value: string) => {
+    if (!value || !value.includes("\\")) return value;
+    try {
+      return JSON.parse(`"${value}"`);
+    } catch {
+      return value;
+    }
+  };
+
   // 正则解析核心逻辑
   const parseHtml = (html: string,
     config: any,
@@ -154,9 +177,9 @@ export default function SearchScreen() {
     while ((match = regex.exec(html)) !== null) {
       // 根据 config 中定义的 match_index 提取数据
       // 注意：match[0] 是完整匹配，group 从 1 开始
-      let image = match[fields.image.match_index] || "";
+      let image = decodeJsonEscapes(match[fields.image.match_index] || "");
       const url = match[fields.url.match_index] || "";
-      let title = match[fields.title.match_index] || "";
+      let title = decodeJsonEscapes(match[fields.title.match_index] || "");
 
       // ID 18 特殊处理，其标签含有 span。
       if (title.includes("<span")) {
@@ -215,7 +238,11 @@ export default function SearchScreen() {
               </View>
               <TouchableOpacity style={styles.viewAllBtn} onPress={() => router.push({
                 pathname: "/webview",
-                params: { url: item.searchUrl, type: "player" },
+                params: {
+                  url: item.moreUrl,
+                  type: "player",
+                  ...(isCycaniUrl(item.sourceUrl) ? { userAgent: CYCANI_USER_AGENT } : {}),
+                },
               })}>
                 <Text style={styles.viewAllBtnText}>查看全部</Text>
               </TouchableOpacity>
@@ -230,7 +257,11 @@ export default function SearchScreen() {
               renderItem={({ item: res }) => (
                 <TouchableOpacity style={styles.horizontalItem} onPress={() => router.push({
                   pathname: "/webview",
-                  params: { url: res.url, type: "player" },
+                  params: {
+                    url: res.url,
+                    type: "player",
+                    ...(isCycaniUrl(res.url) ? { userAgent: CYCANI_USER_AGENT } : {}),
+                  },
                 })}>
                   <Image source={{ uri: res.image }}
                     style={styles.horizontalCover} resizeMode="cover" />

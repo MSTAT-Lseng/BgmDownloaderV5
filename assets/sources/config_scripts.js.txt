@@ -3,14 +3,16 @@ const regex_module = {
 
     // ID: 1
     // 搜索页
-    "www\\.cyfz\\.vip\\\/(search\\.html\\?wd=|search\\\/page\\\/)": {
+    "www\\.cycani\\.org\\\/category": {
         "hidden_elements": [
-            "div.head.flex.between.head-c.header_nav0",
-            "div.m-search",
+            ".container.flex.h-14.items-center.gap-0",
+            ".mb-6",
+            "footer",
+            "a.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm"
         ],
         "custom_css": {
-          "div.row.flex.wrap.top40": {
-            "margin-top": "0"
+          "main": {
+            "padding-top": "0"
           },
           "div.row-9": {
             "padding-bottom": "25px"
