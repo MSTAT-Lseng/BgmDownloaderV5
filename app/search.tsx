@@ -3,7 +3,7 @@ import {
 } from '@/src/services/storage/searchTimeout';
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Toast from 'react-native-root-toast';
 import { AppHeader } from "../components/app-header";
@@ -18,7 +18,6 @@ import sourceIndex from "../assets/sources/index.json";
 // 由于 RN 不支持动态 require，需手动建立映射)
 const sourceConfigs: Record<number, any> = {
   1: require(`${SOURCES_DIR}/config_1.json`),
-  2: require(`${SOURCES_DIR}/config_2.json`),
   4: require(`${SOURCES_DIR}/config_4.json`),
   5: require(`${SOURCES_DIR}/config_5.json`),
   6: require(`${SOURCES_DIR}/config_6.json`),

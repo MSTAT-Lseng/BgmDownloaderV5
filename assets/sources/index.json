@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "次元城动画",
-    "url": "https://www.cycani.org/",
+    "url": "https://www.cycani.org",
     "desc": "仅限国内IP使用",
     "icon": "cycani",
     "enabled": true,
@@ -11,11 +11,11 @@
   {
     "id": 2,
     "name": "打驴动漫",
-    "url": "https://www.dalvdm.cc",
+    "url": "https://www.sbdl.cc",
     "desc": null,
     "icon": "dalvdm",
     "enabled": true,
-    "adaptation": true
+    "adaptation": false
   },
   {
     "id": 3,

@@ -20,15 +20,12 @@ const regex_module = {
         }
     },
     // 详情页
-    "www\\.cyfz\\.vip\\\/pages\\\/": {
+    "www\\.cycani\\.org\\\/anime\\\/": {
       "hidden_elements": [
-        // 下面这俩是一个，适配不同的屏幕大小
-        ".box-width.wow.fadeInUp|1",
-        ".box-width.wow.fadeInUp.animated|1",
-
-        // 下面这俩是一个，适配不同的滑动位置
-        ".head.flex.between.no-null.header_nav0.head-b",
-        ".head.flex.between.no-null.header_nav0"
+        "div.container.flex.h-14.items-center.gap-0",
+        "a.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm",
+        "section.border-t.border-border.py-6",
+        "footer"
       ],
       "custom_css": {
         ".vod-detail.style-detail.rel.cor1.hader0": {
@@ -63,6 +60,10 @@ const regex_module = {
         },
         "body": {
           "padding-top": "0"
+        },
+        "#google-anno-sa": {
+          "height": "0",
+          "box-shadow": "none"
         }
       }
     },
@@ -79,6 +80,10 @@ const regex_module = {
       "custom_css": {
         "body": {
           "padding-top": "0"
+        },
+        "#google-anno-sa": {
+          "height": "0",
+          "box-shadow": "none"
         }
       }
     },
@@ -103,6 +108,10 @@ const regex_module = {
         },
         "body": {
           "padding-top": "0"
+        },
+        "#google-anno-sa": {
+          "height": "0",
+          "box-shadow": "none"
         }
       }
     },
