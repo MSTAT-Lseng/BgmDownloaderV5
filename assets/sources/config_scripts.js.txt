@@ -117,30 +117,30 @@ const regex_module = {
     },
 
     // ID: 5
-    "jcydmz\\.com\\\/index\\.php\\\/vod\\\/search(\\.html\\?wd=|\\\/page\\\/)": {
+    "cilicili\\.net\\\/index\\.php\\\/vod\\\/search(\\.html\\?wd=|\\\/page\\\/)": {
       "hidden_elements": [
-        ".header.head-wrapper",
-        ".head-placeholder.gap",
-        "#app-download",
-        ".bottom"
+        "div.sidebar",
+        "div.footer",
+        "div.footer-content"
+      ],
+      "custom_css": {
+        "div.main": {
+          "padding-top": "0"
+        }
+      }
+    },
+    "www\\.cilicili\\.net\\\/index\\.php\\\/vod\\\/detail\\/id": {
+      "hidden_elements": [
+        "div.sidebar",
+        "div.footer",
+        "div.footer-content"
       ]
     },
-    "www\\.jcydmz\\.com\\\/index\\.php\\\/vod\\\/detail\\/id": {
+    "www\\.cilicili\\.net\\\/index\\.php\\\/vod\\\/play\\\/id": {
       "hidden_elements": [
-        ".header.head-wrapper",
-        ".head-placeholder.gap",
-        "#app-download",
-        ".vod-list.layout-box.gap.pb-0",
-        ".bottom"
-      ]
-    },
-    "www\\.jcydmz\\.com\\\/index\\.php\\\/vod\\\/play\\\/id": {
-      "hidden_elements": [
-        ".header.head-wrapper",
-        ".head-placeholder.gap",
-        ".vod-list.layout-box.gap.pb-0",
-        "#app-download",
-        ".bottom"
+        "div.sidebar",
+        "div.footer",
+        "div.footer-content"
       ]
     },
 
