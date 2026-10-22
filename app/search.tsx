@@ -20,9 +20,6 @@ const sourceConfigs: Record<number, any> = {
   1: require(`${SOURCES_DIR}/config_1.json`),
   4: require(`${SOURCES_DIR}/config_4.json`),
   5: require(`${SOURCES_DIR}/config_5.json`),
-  6: require(`${SOURCES_DIR}/config_6.json`),
-  7: require(`${SOURCES_DIR}/config_7.json`),
-  9: require(`${SOURCES_DIR}/config_9.json`),
   10: require(`${SOURCES_DIR}/config_10.json`),
   11: require(`${SOURCES_DIR}/config_11.json`),
   12: require(`${SOURCES_DIR}/config_12.json`),
@@ -51,6 +48,28 @@ interface GroupedResult {
 // 次元城（cycani）相关配置
 const CYCANI_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1";
 const isCycaniUrl = (url: string) => url.includes("cycani.org");
+
+// 稀饭动漫（xifanacg）的 Supabase 接口需要 apikey 鉴权
+const XIFANACG_API_KEY = "sb_publishable_OBIVAWACIX6lPXrO98_z24_HcsmalkA";
+const isXifanacgUrl = (url: string) => url.includes("xifanacg");
+
+// 将配置中的 {q} 占位符替换为搜索词（支持嵌套对象）
+const fillKeyword = (value: any, keyword: string): any => {
+  if (typeof value === "string") {
+    return value.replace(/\{q\}/g, keyword);
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => fillKeyword(item, keyword));
+  }
+  if (value && typeof value === "object") {
+    const filled: Record<string, any> = {};
+    for (const [key, item] of Object.entries(value)) {
+      filled[key] = fillKeyword(item, keyword);
+    }
+    return filled;
+  }
+  return value;
+};
 
 export default function SearchScreen() {
   const { q } = useLocalSearchParams<{ q: string }>();
@@ -91,20 +110,35 @@ export default function SearchScreen() {
 
         // 次元城的搜索接口要求携带 x-app-name
         const isCycani = isCycaniUrl(source.url);
+        const isXifanacg = isXifanacgUrl(source.url);
 
-        // 次元城的“查看全部”跳转到分类页
+        // “查看全部”地址：次元城跳分类页，稀饭动漫跳站内搜索页，其余沿用搜索地址
         const moreUrl = isCycani
           ? `${source.url.replace(/\/+$/, "")}/category?q=${encodeURIComponent(keyword)}`
-          : searchUrl;
+          : isXifanacg
+            ? `https://next.xifanacg.com/search?q=${encodeURIComponent(keyword)}`
+            : searchUrl;
+
+        // 支持配置中定义 POST 请求体（如稀饭动漫的 Supabase 接口）
+        const requestBody = search_config.body
+          ? JSON.stringify(fillKeyword(search_config.body, keyword))
+          : undefined;
 
         const response = await fetch(searchUrl, { 
+          method: search_config.method || "GET",
           headers: { 
             "User-Agent": userAgent, 
             "Priority": "u=3, i", 
             "Accept-Language": "zh-CN,zh-Hans;q=0.9",
             ...(cookie ? { "Cookie": cookie } : {}),
-            ...(isCycani ? { "x-app-name": "cyc_web" } : {})
+            ...(isCycani ? { "x-app-name": "cyc_web" } : {}),
+            ...(isXifanacg ? {
+              "apikey": XIFANACG_API_KEY,
+              "authorization": `Bearer ${XIFANACG_API_KEY}`,
+              "Content-Type": "application/json",
+            } : {})
           },
+          body: requestBody,
           credentials: 'omit', // 强制忽略本地 Cookie 池，确保只发送 Header 中定义的 Cookie
           signal: controller.signal, // 2. 绑定信号
         });

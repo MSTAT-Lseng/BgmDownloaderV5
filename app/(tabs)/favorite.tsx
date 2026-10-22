@@ -100,7 +100,7 @@ export default function FavoriteScreen() {
           {item.url}
         </Text>
 
-        <Text style={styles.hint}>点击打开 · 长按删除</Text>
+        <Text style={styles.hint}>点击打开 长按删除</Text>
       </Pressable>
     );
   };

@@ -59,8 +59,8 @@
     "url": "https://www.aafun.cc",
     "desc": "无广告，但有些资源需要注册登录。",
     "icon": "aafun",
-    "enabled": true,
-    "adaptation": true
+    "enabled": false,
+    "adaptation": false
   },
   {
     "id": 8,
@@ -77,13 +77,13 @@
     "url": "https://www.mwcy.net",
     "desc": "有广告",
     "icon": "mwcy",
-    "enabled": true,
-    "adaptation": true
+    "enabled": false,
+    "adaptation": false
   },
   {
     "id": 10,
     "name": "稀饭动漫",
-    "url": "https://dm.xifanacg.com",
+    "url": "https://next.xifanacg.com",
     "desc": "有广告，视频清晰。",
     "icon": "xifanacg",
     "enabled": true,
