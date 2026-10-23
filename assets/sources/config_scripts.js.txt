@@ -232,25 +232,29 @@ const regex_module = {
     },
 
     // ID: 12
-    "bgm\\.girigirilove\\.com\\\/search\\\/": {
+    "ani\\.girigirilove\\.com\\\/search": {
       "hidden_elements": [
-        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
-        ".m-search",
-        "#notice"
+        "header",
+        "section.banner-ads.banner-ads-columns",
+        "div.surface.p-5",
+        "nav"
       ]
     },
-    "bgm\\.girigirilove\\.com\\\/GV": {
+    "ani\\.girigirilove\\.com\\\/detail": {
       "hidden_elements": [
-        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
-        ".box-width.ec-tutu.ec-tutu-double.flex",
-        "#notice"
+        "header",
+        "section.banner-ads.banner-ads-columns",
+        "div.surface.p-5",
+        "nav"
       ]
     },
-    "bgm\\.girigirilove\\.com\\\/play": {
+    "ani\\.girigirilove\\.com\\\/play": {
       "hidden_elements": [
-        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
-        ".ec-tutu",
-        "#notice"
+        "header",
+        "section.banner-ads.banner-ads-columns",
+        "section.banner-ads.banner-ads-compact",
+        "div.surface.p-5",
+        "nav"
       ]
     },
 

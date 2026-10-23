@@ -71,6 +71,25 @@ const fillKeyword = (value: any, keyword: string): any => {
   return value;
 };
 
+// girigirilove 相关配置
+const GIRIGIRILOVE_HOST = "https://ani.girigirilove.com";
+const isGirigiriloveUrl = (url: string) => url.includes("girigirilove");
+
+// 从搜索结果 URL 中提取 vod_id
+const extractGirigiriloveVodId = (url: string): string => {
+  if (!url) return "";
+  const patterns = [
+    /\/detail\/([A-Za-z0-9_-]+?)(?:\.html)?(?:[/?#]|$)/, // /detail/123
+    /[?&](?:vod_id|id)=([A-Za-z0-9_-]+)/,               // ?vod_id=123 / ?id=123
+    /\/(\d+)(?:\.html)?(?:[/?#]|$)/,                    // /xxx/123.html 或 /xxx/123/
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return "";
+};
+
 export default function SearchScreen() {
   const { q } = useLocalSearchParams<{ q: string }>();
   const [results, setResults] = useState<GroupedResult[]>([]);
@@ -112,12 +131,14 @@ export default function SearchScreen() {
         const isCycani = isCycaniUrl(source.url);
         const isXifanacg = isXifanacgUrl(source.url);
 
-        // “查看全部”地址：次元城跳分类页，稀饭动漫跳站内搜索页，其余沿用搜索地址
-        const moreUrl = isCycani
-          ? `${source.url.replace(/\/+$/, "")}/category?q=${encodeURIComponent(keyword)}`
-          : isXifanacg
-            ? `https://next.xifanacg.com/search?q=${encodeURIComponent(keyword)}`
-            : searchUrl;
+        // “查看全部”地址：girigirilove 走站内搜索页，次元城跳分类页，稀饭动漫跳站内搜索页，其余沿用搜索地址
+        const moreUrl = isGirigiriloveUrl(source.url)
+          ? `${GIRIGIRILOVE_HOST}/search?q=${encodeURIComponent(keyword)}`
+          : isCycaniUrl(source.url)
+            ? `${source.url.replace(/\/+$/, "")}/category?q=${encodeURIComponent(keyword)}`
+            : isXifanacgUrl(source.url)
+              ? `https://next.xifanacg.com/search?q=${encodeURIComponent(keyword)}`
+              : searchUrl;
 
         // 支持配置中定义 POST 请求体（如稀饭动漫的 Supabase 接口）
         const requestBody = search_config.body
@@ -225,11 +246,22 @@ export default function SearchScreen() {
       }
 
       if (title && url) {
+        const rawUrl = url.trim();
+        let finalUrl = details_format.replace("{host}", host).replace('{result}', rawUrl);
+
+        // girigirilove：条目统一改写为 https://ani.girigirilove.com/detail/{vod_id}
+        if (isGirigiriloveUrl(host)) {
+          const vodId = extractGirigiriloveVodId(rawUrl) || extractGirigiriloveVodId(finalUrl);
+          if (vodId) {
+            finalUrl = `${GIRIGIRILOVE_HOST}/detail/${vodId}`;
+          }
+        }
+
         list.push({
           id: `${sourceName}-${url}`, // 生成临时唯一ID
           title: title.trim(),
           image: image.trim(),
-          url: details_format.replace("{host}", host).replace('{result}', url.trim()),
+          url: finalUrl,
           sourceName: sourceName
         });
       }

@@ -101,8 +101,8 @@
   {
     "id": 12,
     "name": "girigiri爱动漫",
-    "url": "https://bgm.girigirilove.com",
-    "desc": "少量广告，视频清晰。",
+    "url": "https://ani.girigirilove.com",
+    "desc": "少量广告，视频清晰。仅国内IP可用。",
     "icon": "girigirilove",
     "enabled": true,
     "adaptation": true
