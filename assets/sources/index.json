@@ -159,7 +159,7 @@
     "desc": "有广告，画质清晰。",
     "icon": "11kt",
     "enabled": true,
-    "adaptation": true
+    "adaptation": false
   },
   {
     "id": 19,
