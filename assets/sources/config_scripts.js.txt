@@ -259,30 +259,31 @@ const regex_module = {
     },
 
     // ID: 14
-    "www\\.gugu3\\.com\\\/index\\.php\\\/vod\\\/search": {
+    "gugu\\.fan\\\/search": {
       "hidden_elements": [
-        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
-        ".m-search",
-        "#notice",
-        ".foot-table-box"
-      ]
+        "header",
+        "section.catalog-query-card",
+        "footer"
+      ],
+      "custom_css": {
+        "main": {
+          "padding-top": "0"
+        }
+      }
     },
-    "www\\.gugu3\\.com\\\/index\\.php\\\/vod\\\/detail\\\/id\\\/": {
+    "gugu\\.fan\\\/anime\\\/": {
       "hidden_elements": [
-        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
-        ".foot-table-box",
-        "#notice",
-        ".box-width.ec-tutu.ec-tutu-double.flex"
-      ]
-    },
-    "www\\.gugu3\\.com\\\/index\\.php\\\/vod\\\/play\\\/id\\\/": {
-      "hidden_elements": [
-        ".head.flex.between.transition.header-nav-icon2.header-wap-nav1.head-c",
-        ".foot-table-box",
-        "#notice",
-        ".none.tutu-margins.top5.top40"
-      ]
-    },
+        "header",
+        "section.catalog-query-card",
+        "footer",
+        "div.detail-anchor-shell"
+      ],
+      "custom_css": {
+        "main": {
+          "padding-top": "0"
+        }
+      }
+    }
 
     // ID: 18
     "11kt\\.net\\\/index\\.php\\\/vod\\\/search": {

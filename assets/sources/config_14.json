@@ -1,8 +1,8 @@
 {
   "search_config": {
-    "url": "{host}/index.php/vod/search.html?wd={q}",
+    "url": "{host}/search?q={q}",
     "details_format": "{host}{result}",
-    "item_regex": "<div\\s+class=\"vod-detail\\s+style-detail\\s+cor4\\s+search-list\"[\\s\\S]*?<img[^>]*\\bdata-src=\"([^\"]+)\"[^>]*>[\\s\\S]*?<a[^>]*href=\"([^\"]+)\"[^>]*>[\\s\\S]*?<h3[^>]*class=\"slide-info-title[^\"]*\"[^>]*>\\s*([^<]+?)\\s*<\\/h3>[\\s\\S]*?<\\/div>\\s*<\\/div>\\s*<\\/div>\\s*<\\/div>",
+    "item_regex": "<article\\s+class=\"schedule-card\\s+search-result-card\"[\\s\\S]*?<a\\s+class=\"schedule-poster\"\\s+href=\"[^\"]+\"[\\s\\S]*?<img[^>]*?\\ssrc=\"([^\"]+)\"[^>]*>[\\s\\S]*?<a\\s+href=\"([^\"]+)\"[^>]*>\\s*<h2[^>]*>\\s*([^<]+?)\\s*<\\/h2>[\\s\\S]*?<\\/article>",
     "fields": {
       "url": {
         "match_index": 2,

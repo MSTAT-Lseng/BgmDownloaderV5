@@ -113,13 +113,13 @@
     "url": "https://clicli.cc",
     "desc": "有广告，视频高清。",
     "icon": "clicli",
-    "enabled": true,
+    "enabled": false,
     "adaptation": false
   },
   {
     "id": 14,
     "name": "咕咕番",
-    "url": "https://www.gugu3.com",
+    "url": "https://gugu.fan",
     "desc": "有广告，视频清晰。",
     "icon": "gugu3",
     "enabled": true,
