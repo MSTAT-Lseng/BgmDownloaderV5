@@ -168,7 +168,7 @@
     "desc": "有广告，需要手动在播放器中设置1080P画质，部分地区存在被拦截无法正常访问现象",
     "icon": "xgcartoon",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 20,

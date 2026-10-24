@@ -283,61 +283,28 @@ const regex_module = {
           "padding-top": "0"
         }
       }
-    }
+    },
 
-    // ID: 18
-    "11kt\\.net\\\/index\\.php\\\/vod\\\/search": {
+    // ID: 19
+    "cn\\.xgcartoon\\.com\\\/search": {
       "hidden_elements": [
-        ".fed-head-info.fed-back-whits.fed-min-width.fed-box-shadow",
-        ".fed-pops-list.fed-font-size.fed-back-whits.fed-part-rows",
-        ".fed-tabr-info.fed-back-whits.fed-min-width.fed-line-top.fed-hide-sm",
-        ".fed-foot-info.fed-part-layout.fed-back-whits"
-      ],
-      "custom_css": {
-        ".fed-min-width": {
-          "position": "relative",
-          "z-index": "9999999999999999999",
-          "padding-top": "0",
-          "padding-bottom": "0",
-          "margin-bottom": "-275px"
-        }
-      }
+        "div.headers",
+        "div.footer"
+      ]
     },
-    "11kt\\.net\\\/index\\.php\\\/vod\\\/detail\\\/id\\\/": {
+    "cn\\.xgcartoon\\.com\\\/detail\\\/": {
       "hidden_elements": [
-        ".fed-head-info.fed-back-whits.fed-min-width.fed-box-shadow",
-        ".fed-pops-list.fed-font-size.fed-back-whits.fed-part-rows",
-        ".fed-tabr-info.fed-back-whits.fed-min-width.fed-line-top.fed-hide-sm",
-        ".fed-foot-info.fed-part-layout.fed-back-whits"
-      ],
-      "custom_css": {
-        ".fed-min-width": {
-          "position": "relative",
-          "z-index": "9999999999999999999",
-          "padding-top": "0",
-          "padding-bottom": "0",
-          "margin-bottom": "-275px",
-          "background": "#f5f5f5"
-        }
-      }
+        "div.headers",
+        "div.footer",
+        "div.share"
+      ]
     },
-    "11kt\\.net\\\/index\\.php\\\/vod\\\/play\\\/id\\\/": {
+    "xgct\\.com\\\/video\\\/": {
       "hidden_elements": [
-        ".fed-head-info.fed-back-whits.fed-min-width.fed-box-shadow",
-        ".fed-pops-list.fed-font-size.fed-back-whits.fed-part-rows",
-        ".fed-tabr-info.fed-back-whits.fed-min-width.fed-line-top.fed-hide-sm",
-        ".fed-foot-info.fed-part-layout.fed-back-whits"
-      ],
-      "custom_css": {
-        ".fed-min-width": {
-          "position": "relative",
-          "z-index": "9999999999999999999",
-          "padding-top": "0",
-          "padding-bottom": "0",
-          "margin-bottom": "-275px",
-          "background": "#f5f5f5"
-        }
-      }
+        "div.headers",
+        "div.footer",
+        "div.addthis-box.row"
+      ]
     },
 
     // ID: 24

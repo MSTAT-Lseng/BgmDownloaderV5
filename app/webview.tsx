@@ -32,6 +32,12 @@ const WebViewWithRef = WebView as unknown as React.ComponentType<
   React.ComponentProps<typeof WebView> & { ref?: React.Ref<WebViewHandle | null> }
 >;
 
+// player 模式下允许从其他站点跳转的外部播放页白名单
+const PLAYER_URL_WHITELIST = [
+  "xgct.com/video",
+  "xgcartoon.com/"
+];
+
 export default function WebviewScreen() {
   const navigation = useNavigation();
   const { url, type = 'default' /* 1. 接收 type 参数，默认为 'default'*/, userAgent /* 2. 接收上页传来的 UA */ } = useLocalSearchParams < {
@@ -266,6 +272,12 @@ export default function WebviewScreen() {
           onShouldStartLoadWithRequest={(request) => {
             // 如果是 player，只允许加载规则内的 host，防止广告跳转。
             if (type === "player") {
+              // 白名单内的外部播放页允许跳转
+              if (PLAYER_URL_WHITELIST.some((item) => request.url.includes(item))) {
+                return true;
+              }
+              console.log(`load url ${request.url} failed: permission dined.`)
+
               let domain = webUrl.split('/')[2];
               if (request.url.includes(domain) || request.url.includes(domain.replace("www.", "m."))) {
                 return true;

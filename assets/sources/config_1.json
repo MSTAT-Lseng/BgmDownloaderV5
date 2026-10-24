@@ -1,7 +1,7 @@
 {
   "search_config": {
     "url": "{host}/api/videos/search?q={q}&page=1&page_size=24",
-    "details_format": "{host}anime/{result}",
+    "details_format": "{host}/anime/{result}",
     "item_regex": "\"video_id\":\\s*(\\d+)[\\s\\S]*?\"title\":\\s*\"((?:[^\"\\\\]|\\\\.)*)\"[\\s\\S]*?\"cover_url\":\\s*\"([^\"]+)\"",
     "fields": {
       "image": {
