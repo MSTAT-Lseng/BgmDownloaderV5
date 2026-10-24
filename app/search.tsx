@@ -245,6 +245,11 @@ export default function SearchScreen() {
         image = host + image;
       }
 
+      // 百度封面链接中的 &amp; 需要还原为 &
+      if (image.includes("baidu.com")) {
+        image = image.replace(/&amp;/g, "&");
+      }
+
       if (title && url) {
         const rawUrl = url.trim();
         let finalUrl = details_format.replace("{host}", host).replace('{result}', rawUrl);

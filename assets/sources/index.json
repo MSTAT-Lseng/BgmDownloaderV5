@@ -194,13 +194,13 @@
     "url": "https://www.lmm58.com",
     "desc": "视频高清，移动端有广告，视频中间部分可能存在博彩广告。",
     "icon": "lmm58",
-    "enabled": true,
+    "enabled": false,
     "adaptation": false
   },
   {
     "id": 23,
     "name": "五弹幕动漫",
-    "url": "https://www.5dm.link",
+    "url": "https://www.5dm.dev",
     "desc": "有广告，视频清晰，请勿登录，因为注册可能要收费，视频加载稍慢，请等待。",
     "icon": "5dm",
     "enabled": true,
@@ -210,7 +210,7 @@
     "id": 24,
     "name": "AGE动漫",
     "url": "https://www.agedm.io",
-    "desc": "经典动漫站点，有广告",
+    "desc": "经典动漫站点，有广告。仅限国内IP。",
     "icon": "agedm",
     "enabled": true,
     "adaptation": true
