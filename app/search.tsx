@@ -25,6 +25,7 @@ const sourceConfigs: Record<number, any> = {
   12: require(`${SOURCES_DIR}/config_12.json`),
   14: require(`${SOURCES_DIR}/config_14.json`),
   19: require(`${SOURCES_DIR}/config_19.json`),
+  20: require(`${SOURCES_DIR}/config_20.json`),
   21: require(`${SOURCES_DIR}/config_21.json`),
   24: require(`${SOURCES_DIR}/config_24.json`),
 };

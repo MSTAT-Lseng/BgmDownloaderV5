@@ -307,6 +307,28 @@ const regex_module = {
       ]
     },
 
+    // ID: 20
+    "xdmdm\\.com\\\/search": {
+      "hidden_elements": [
+        "header",
+        "form.flex.gap-2",
+        "footer"
+      ]
+    },
+    "xdmdm\\.com\\\/video": {
+      "hidden_elements": [
+        "header",
+        "footer",
+        "div.flex.flex-col.items-center.gap-3.mb-8"
+      ]
+    },
+    "xdmdm\\.com\\\/play\\\/": {
+      "hidden_elements": [
+        "header",
+        "footer"
+      ]
+    },
+
     // ID: 24
     "m\\.agedm\\.io": {
       "hidden_elements": [

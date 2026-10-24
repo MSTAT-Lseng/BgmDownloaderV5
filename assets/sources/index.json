@@ -173,11 +173,11 @@
   {
     "id": 20,
     "name": "XDM动漫",
-    "url": "https://www.xuandm.com",
-    "desc": "有广告，如遇异常，尝试切换资源。",
+    "url": "https://xdmdm.com",
+    "desc": "有广告，如遇异常，尝试切换资源。有可能需要梯子。",
     "icon": "xuandm",
     "enabled": true,
-    "adaptation": false
+    "adaptation": true
   },
   {
     "id": 21,
