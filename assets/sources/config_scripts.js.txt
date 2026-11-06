@@ -1,7 +1,9 @@
+// 页面净化脚本：按 URL 正则匹配对应站点的规则，隐藏广告 / 导航元素并覆盖部分样式
 try{
+/** 键是 URL 正则，值是该页面要隐藏的元素选择器和要覆盖的样式 */
 const regex_module = {
 
-    // ID: 1
+    // 站点 1：次元城
     // 搜索页
     "www\\.cycani\\.org\\\/category": {
         "hidden_elements": [
@@ -43,7 +45,7 @@ const regex_module = {
       ],
     },
 
-    // ID: 4
+    // 站点 4：anime7
     // 搜索页
     "anime7\\.top\\\/vod-search\\\/(?:\\?wd=|page\\\/)": {
       "hidden_elements": [
@@ -116,7 +118,7 @@ const regex_module = {
       }
     },
 
-    // ID: 5
+    // 站点 5：cilicili
     "cilicili\\.net\\\/index\\.php\\\/vod\\\/search(\\.html\\?wd=|\\\/page\\\/)": {
       "hidden_elements": [
         "div.sidebar",
@@ -144,7 +146,7 @@ const regex_module = {
       ]
     },
 
-    // ID: 10
+    // 站点 10：稀饭动漫
     "next\\.xifanacg\\.com": {
       "custom_css": {
         "body": {
@@ -176,7 +178,7 @@ const regex_module = {
     },
 
 
-    // ID: 11
+    // 站点 11：dmbus
     "dmbus\\.cc\\\/s-": {
       "hidden_elements": [
         "#mask",
@@ -231,7 +233,7 @@ const regex_module = {
       }
     },
 
-    // ID: 12
+    // 站点 12：girigirilove
     "ani\\.girigirilove\\.com\\\/search": {
       "hidden_elements": [
         "header",
@@ -258,7 +260,7 @@ const regex_module = {
       ]
     },
 
-    // ID: 14
+    // 站点 14：gugu
     "gugu\\.fan\\\/search": {
       "hidden_elements": [
         "header",
@@ -285,7 +287,7 @@ const regex_module = {
       }
     },
 
-    // ID: 19
+    // 站点 19：西瓜卡通
     "cn\\.xgcartoon\\.com\\\/search": {
       "hidden_elements": [
         "div.headers",
@@ -307,7 +309,7 @@ const regex_module = {
       ]
     },
 
-    // ID: 20
+    // 站点 20：xdmdm
     "xdmdm\\.com\\\/search": {
       "hidden_elements": [
         "header",
@@ -329,7 +331,7 @@ const regex_module = {
       ]
     },
 
-    // ID: 24
+    // 站点 24：agedm
     "m\\.agedm\\.io": {
       "hidden_elements": [
         ".container.head-container",
@@ -342,14 +344,13 @@ const regex_module = {
 Object.keys(regex_module).forEach(pattern => {
   const regex = new RegExp(pattern);
     
-  // 1. 检查正则是否匹配
+  // 只处理当前页面地址命中的规则
   if (regex.test(window.location.href)) {
 
-    // hidden elements
+    // 隐藏元素：选择器支持 "selector|下标"，即只隐藏匹配到的第 N 个元素
     if (regex_module[pattern].hasOwnProperty('hidden_elements')) {
       const hidden_elements = regex_module[pattern].hidden_elements;
         
-      // 遍历并执行 display: none
       hidden_elements.forEach(selector => {
         try {
           if (selector.includes('|')) {
@@ -357,7 +358,6 @@ Object.keys(regex_module).forEach(pattern => {
             const elements = document.querySelectorAll(_selector);
             const targetIndex = parseInt(index);
 
-            // 检查元素是否存在且索引有效
             if (elements[targetIndex]) {
               elements[targetIndex].style.display = 'none';
             }
@@ -373,11 +373,10 @@ Object.keys(regex_module).forEach(pattern => {
       });
     }
       
-    // custom css
+    // 覆盖样式：custom_css 是「选择器 → { 属性: 值 }」的两层结构，直接写到行内样式上
     if (regex_module[pattern].hasOwnProperty('custom_css')) {
       const custom_css = regex_module[pattern].custom_css;
         
-      // 遍历并执行 custom_css
       Object.keys(custom_css).forEach(selector => {
         document.querySelectorAll(selector).forEach(el => {
           Object.keys(custom_css[selector]).forEach(property => {
@@ -392,8 +391,8 @@ Object.keys(regex_module).forEach(pattern => {
 
 } catch (error) {}
 
-
-// iOS
+// 通知原生端脚本已注入完毕
 window.ReactNativeWebView.postMessage('hello');
 
+// 注入脚本必须返回一个真值，否则 iOS 端不会执行
 true;

@@ -1,22 +1,27 @@
-import { Ionicons } from "@expo/vector-icons"; // Expo 内置图标库
+/**
+ * @file 通用顶部标题栏：居中标题，可选左侧返回按钮与右侧功能图标。
+ */
+
+import { Ionicons } from "@expo/vector-icons";
 import { ReactNode } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
+/** 标题栏参数 */
 interface AppHeaderProps {
   title: string;
-  icon?: ReactNode; // 接收外部传入的图标组件
-  onIconPress?: () => void; // 图标点击事件
-  showBack?: boolean;    // 是否显示返回按钮
-  onBackPress?: () => void;
+  icon?: ReactNode; // 右侧功能图标，传入才渲染
+  onIconPress?: () => void; // 右侧图标点击回调
+  showBack?: boolean; // 是否显示左侧返回按钮
+  onBackPress?: () => void; // 返回按钮点击回调
 }
 
+/** 通用标题栏；返回键在左、功能图标在右，两者都用绝对定位，标题始终居中 */
 export function AppHeader({ title, icon, onIconPress, showBack, onBackPress }: AppHeaderProps) {
   return (
     <SafeAreaView edges={["top"]} style={styles.headerSafe}>
       <View style={styles.header}>
-        {/* 左侧返回按钮 */}
         {showBack && (
           <TouchableOpacity 
             style={styles.backContainer} 
@@ -27,10 +32,8 @@ export function AppHeader({ title, icon, onIconPress, showBack, onBackPress }: A
           </TouchableOpacity>
         )}
 
-        {/* 增加左右 padding 避免文字紧贴图标或边缘 */}
         <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
 
-        {/* 只有在传入 icon 时才渲染按钮 */}
         {icon && (
           <TouchableOpacity 
             style={styles.iconContainer}
@@ -48,6 +51,7 @@ export function AppHeader({ title, icon, onIconPress, showBack, onBackPress }: A
 }
 
 const styles = StyleSheet.create({
+  /** 外层容器，负责顶部安全区 */
   headerSafe: {
     backgroundColor: "#0B0F1A",
   },
@@ -61,16 +65,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#0B0F1A",
   },
 
+  /** 标题，限制宽度避免压住两侧按钮 */
   headerTitle: {
     fontSize: 18,
     fontWeight: "500",
     letterSpacing: 1,
     color: "#EAF0FF",
-    maxWidth: '75%', // 限制宽度防止覆盖图标
+    maxWidth: '75%',
   },
 
   iconContainer: {
-    position: 'absolute', // 绝对定位在右侧
+    position: 'absolute', // 绝对定位贴右侧，保持标题居中
     right: 16,
     height: '100%',
     justifyContent: 'center',
@@ -83,8 +88,8 @@ const styles = StyleSheet.create({
   },
 
   backContainer: {
-    position: 'absolute',
-    left: 16, // 定位在左侧
+    position: 'absolute', // 绝对定位贴左侧，保持标题居中
+    left: 16,
     height: '100%',
     justifyContent: 'center',
     zIndex: 10,

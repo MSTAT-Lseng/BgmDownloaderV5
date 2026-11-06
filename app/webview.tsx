@@ -12,8 +12,14 @@ import { Animated, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } 
 import { WebView } from 'react-native-webview';
 
 /**
+ * @file 通用内嵌浏览器页：负责加载站点页面、展示加载进度与错误、处理全屏旋转，以及播放页收藏。
+ */
+
+/**
+ * WebView 的命令式方法句柄。
+ *
  * react-native-webview 14 的 .d.ts 只把组件声明成 FunctionComponent（漏了 forwardRef），
- * 但其源码实际用 forwardRef + useImperativeHandle 暴露了下列命令式方法，这里按真实形态补类型。
+ * 但源码实际用 forwardRef + useImperativeHandle 暴露了下面这些方法，这里按真实形态补类型。
  */
 type WebViewHandle = {
   goForward: () => void;
@@ -32,7 +38,7 @@ const WebViewWithRef = WebView as unknown as React.ComponentType<
   React.ComponentProps<typeof WebView> & { ref?: React.Ref<WebViewHandle | null> }
 >;
 
-// player 模式下允许从其他站点跳转的外部播放页白名单
+/** player 模式下允许从其他站点跳转的外部播放页白名单 */
 const PLAYER_URL_WHITELIST = [
   "xgct.com/video",
   "xgcartoon.com/"
@@ -40,19 +46,21 @@ const PLAYER_URL_WHITELIST = [
 
 export default function WebviewScreen() {
   const navigation = useNavigation();
-  const { url, type = 'default' /* 1. 接收 type 参数，默认为 'default'*/, userAgent /* 2. 接收上页传来的 UA */ } = useLocalSearchParams < {
+
+  // url：要加载的页面地址；type：default / sources / player；userAgent：来源页指定的 UA
+  const { url, type = 'default', userAgent } = useLocalSearchParams < {
     url ? : string,
     type ?: string;
     userAgent ?: string;
   } > ();
 
+  // expo-router 的参数可能是 string | string[]，这里统一取第一个值
   const webUrl = useMemo(() => {
-    // expo-router params 可能是 string | string[]；这里做一个兜底
     if (!url) return '';
     return Array.isArray(url) ? url[0] : url;
   }, [url]);
 
-  // 未传 UA 时保持 WebView 默认 UA
+  // 未传 UA 时返回 undefined，保持 WebView 的默认 UA
   const webUserAgent = useMemo(() => {
     if (!userAgent) return undefined;
     return Array.isArray(userAgent) ? userAgent[0] : userAgent;
@@ -63,10 +71,10 @@ export default function WebviewScreen() {
   const [title, setTitle] = useState('加载中...');
   const [errorText, setErrorText] = useState < string | null > (null);
 
-  const [progress, setProgress] = useState(0); // 进度值 0-1
+  const [progress, setProgress] = useState(0); // 加载进度，取值 0 ~ 1
   const animatedProgress = useRef(new Animated.Value(0)).current;
 
-  // 当进度改变时，执行动画
+  /** 加载进度变化时，驱动进度条动画过渡到新位置 */
   useEffect(() => {
     Animated.timing(animatedProgress, {
       toValue: progress,
@@ -75,12 +83,12 @@ export default function WebviewScreen() {
     }).start();
   }, [progress]);
 
-  // Script
   const [script, setScript] = useState('');
   const [fullScreenScript, setFullScreenScript] = useState('');
+
+  /** 播放页才加载全屏监听脚本；其他页面直接跳过，避免无谓的 IO */
   useEffect(() => {
     const loadScripts = async () => {
-      // 只有类型匹配时才加载，减少无谓的 IO 操作
       if (type !== "player") return;
 
       try {
@@ -104,13 +112,12 @@ export default function WebviewScreen() {
     };
 
     loadScripts();
-  }, [type]); // 加入 type 依赖，确保逻辑严谨
+  }, [type]);
 
-  // 1. 使用 Ref 同步脚本内容，避免闭包陷阱
   const scriptRef = useRef('');
   const timerRef = useRef<number | null>(null);
 
-  // 2. 加载逻辑只负责读文件
+  /** 读取页面净化脚本，并同步写入 scriptRef，供定时器直接使用 */
   useEffect(() => {
     if (type !== "player") return;
     
@@ -120,14 +127,19 @@ export default function WebviewScreen() {
         if (localUri) {
           const content = await FileSystem.readAsStringAsync(localUri);
           setScript(content);
-          scriptRef.current = content; // 同步到 Ref
+          scriptRef.current = content;
         }
       } catch (e) { console.error(e); }
     };
     load();
   }, [type]);
 
-  // 3. 独立管理定时器
+  /**
+   * 每 2 秒把净化脚本重新注入一次。
+   *
+   * 单页应用跳转不会重新触发注入，所以用定时器兜底；
+   * 脚本内容放 Ref 里读取，避免闭包拿到旧值。
+   */
   useEffect(() => {
     if (type === "player") {
       timerRef.current = setInterval(() => {
@@ -142,6 +154,7 @@ export default function WebviewScreen() {
     };
   }, [type]);
 
+  /** 接收页面内注入脚本发回的消息，用于同步全屏状态下的屏幕方向 */
   const handleMessage = useCallback(async (event: any) => {
     let data: any = null;
     try {
@@ -151,8 +164,7 @@ export default function WebviewScreen() {
     }
 
     if (data.type === "enter_fullscreen") {
-      // 进入全屏 -> 锁横屏
-      // iOS 上能否立刻旋转还取决于系统策略、用户是否锁定竖屏、页面是否真进入全屏等
+      // 进入全屏后锁横屏；iOS 上能否立刻旋转还取决于系统策略、用户是否锁定竖屏、页面是否真的进入全屏
       try {
         await ScreenOrientation.lockAsync(
           ScreenOrientation.OrientationLock.LANDSCAPE
@@ -161,12 +173,11 @@ export default function WebviewScreen() {
     }
 
     if (data.type === "exit_fullscreen") {
-      // 退出全屏 -> 恢复竖屏（或 unlockAsync 跟随系统）
+      // 退出全屏后恢复竖屏；如需跟随系统，可改用 unlockAsync()
       try {
         await ScreenOrientation.lockAsync(
           ScreenOrientation.OrientationLock.PORTRAIT_UP
         );
-        // 或者：await ScreenOrientation.unlockAsync();
       } catch {}
     }
   }, []);
@@ -178,47 +189,46 @@ export default function WebviewScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [favoriteName, setFavoriteName] = useState('');
 
-  // 检查当前 URL 是否已收藏
+  /** 查询当前地址是否已收藏；非播放页或地址为空时直接置为未收藏 */
   const checkFavoriteStatus = useCallback(async (url: string) => {
-    // 如果不是播放器类型或 URL 为空，直接返回
     if (type !== 'player' || !url) {
       setIsFavorite(false);
       return;
     }
 
-    // 异步检查前，可以根据需要决定是否重置（推荐重置，避免旧页面的状态残留）
     try {
-    // 确保表已创建
-    await FavoritesDB.init(); 
-    
-    const exists = await FavoritesDB.exists(url);
+      // 确保表已创建
+      await FavoritesDB.init(); 
+      
+      const exists = await FavoritesDB.exists(url);
       setIsFavorite(exists);
     } catch (e) {
       console.error("检查收藏状态失败:", e);
     }
-  }, [type]); // 注意：这里依赖项应包含 type (你代码中是 types，请统一变量名)
+  }, [type]);
 
-  // 监听 currentUrl 的变化
+  /** 地址变化时先重置收藏状态，避免残留上一个页面的状态，再异步查询 */
   useEffect(() => {
-    // 当 URL 变化时，先重置状态，防止显示上一个网页的收藏状态
     setIsFavorite(false); 
     
     if (currentUrl) {
       checkFavoriteStatus(currentUrl);
     }
   }, [currentUrl, checkFavoriteStatus]);
-  // 修改后的收藏点击处理
+
+  /** 点击收藏按钮：已收藏则取消收藏，未收藏则打开命名弹窗 */
   const handleFavoritePress = async () => {
     if (isFavorite) {
       await FavoritesDB.removeByUrl(currentUrl);
       setIsFavorite(false);
       return;
     }
-    // 打开自定义模态框
+    // 打开命名弹窗，默认用当前页面标题作为收藏名
     setFavoriteName(title); 
     setModalVisible(true);
   };
 
+  /** 保存收藏：名称为空时不做任何处理 */
   const saveFavorite = async () => {
     if (favoriteName.trim()) {
       await FavoritesDB.upsert({ name: favoriteName, url: currentUrl });
@@ -266,13 +276,12 @@ export default function WebviewScreen() {
         <WebViewWithRef
           ref={webRef}
           source={{ uri: webUrl }}
-          // 应用来源页传入的 User-Agent（未传时使用 WebView 默认值）
+          // 应用来源页传入的 UA，未传时使用 WebView 默认值
           userAgent={webUserAgent}
-          // 核心：强制所有链接在当前 WebView 中打开
+          // 核心：拦截所有跳转，强制链接在当前 WebView 中打开
           onShouldStartLoadWithRequest={(request) => {
-            // 如果是 player，只允许加载规则内的 host，防止广告跳转。
+            // 播放页只放行白名单域名和同站页面，防止被广告跳转
             if (type === "player") {
-              // 白名单内的外部播放页允许跳转
               if (PLAYER_URL_WHITELIST.some((item) => request.url.includes(item))) {
                 return true;
               }
@@ -285,17 +294,16 @@ export default function WebviewScreen() {
                 return false;
               }
             } else {
-              // 允许加载所有 http 和 https 链接
+              // 非播放页只放行 http/https，tel:、mailto: 等其他协议一律拦下
               if (request.url.startsWith('http')) {
                 return true; 
               }
             }
-            // 可以在这里处理其他协议，如 tel: 或 mailto:
             return false;
           }}
           style={styles.web}
           onLoadProgress={({ nativeEvent }) => {
-            setProgress(nativeEvent.progress); // progress 是 0 到 1 之间的浮点数
+            setProgress(nativeEvent.progress);
           }}
           onLoadStart={() => {
             setProgress(0);
@@ -321,9 +329,11 @@ export default function WebviewScreen() {
           startInLoadingState
           allowsBackForwardNavigationGestures
           setSupportMultipleWindows={false}
-          allowsFullscreenVideo={true}     // 允许全屏视频 (主要针对 Android)
-          mediaPlaybackRequiresUserAction={true} // 让用户手势触发播放/全屏更稳
-          // allowsInlineMediaPlayback={true} // 允许行内播放 (iOS 必须)
+          // 允许全屏视频（主要针对 Android）
+          allowsFullscreenVideo={true}
+          // 媒体必须由用户手势触发，否则全屏切换在部分机型上会失效
+          mediaPlaybackRequiresUserAction={true}
+          // 如需 iOS 行内播放，可再加上 allowsInlineMediaPlayback={true}
           mixedContentMode="always"
         />
 
@@ -373,6 +383,7 @@ export default function WebviewScreen() {
 }
 
 const styles = StyleSheet.create({
+  /** 页面骨架 */
   container: {
     flex: 1,
     backgroundColor: '#05070C'
@@ -384,6 +395,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#05070C'
   },
+
+  /** 加载失败遮罩 */
   errorMask: {
     position: 'absolute',
     top: 0,
@@ -405,6 +418,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center'
   },
+
+  /** 顶部加载进度条 */
   progressContainer: {
     position: 'absolute',
     top: 0,
@@ -412,13 +427,14 @@ const styles = StyleSheet.create({
     right: 0,
     height: 3,
     backgroundColor: 'transparent',
-    zIndex: 10, // 确保在 WebView 之上
+    zIndex: 10, // 必须高于 WebView 才可见
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#3B82F6', // 建议使用亮蓝色
+    backgroundColor: '#3B82F6',
   },
 
+  /** 收藏命名弹窗 */
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',

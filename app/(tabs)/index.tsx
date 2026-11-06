@@ -1,3 +1,7 @@
+/**
+ * @file 首页日历：拉取 Bangumi 每日放送数据，按“今天”起始的顺序分组展示，并支持本地关键词过滤。
+ */
+
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Svg, { Circle, Path } from "react-native-svg";
@@ -15,13 +19,15 @@ import {
   View
 } from "react-native";
 
+/** Bangumi 返回的星期信息 */
 type CalendarWeekday = {
   en: string;
   cn: string;
   ja: string;
-  id: number; // 1..7
+  id: number; // 1 ~ 7，周一为 1
 };
 
+/** Bangumi 返回的单条番剧 */
 type CalendarItem = {
   id: number;
   url: string;
@@ -43,22 +49,26 @@ type CalendarItem = {
   collection?: { doing?: number };
 };
 
+/** 按天分组后的放送列表 */
 type CalendarDay = {
   weekday: CalendarWeekday;
   items: CalendarItem[];
 };
 
+/** 取今天的星期序号，统一成 1 ~ 7（周一为 1）；JS 的 0 表示周日 */
 function getTodayWeekdayId() {
-  const jsDay = new Date().getDay(); // 0..6
-  return jsDay === 0 ? 7 : jsDay;    // 转成 1..7（周一=1）
+  const jsDay = new Date().getDay(); // 0 ~ 6
+  return jsDay === 0 ? 7 : jsDay;
 }
 
+/** 优先使用中文名，没有则回退到原名 */
 function pickTitle(item: CalendarItem) {
   const cn = (item.name_cn || "").trim();
   if (cn.length > 0) return cn;
   return item.name;
 }
 
+/** 按尺寸由小到大挑一张封面，都没有时返回空串 */
 function pickCover(item: CalendarItem) {
   return (
     item.images?.common ||
@@ -70,9 +80,9 @@ function pickCover(item: CalendarItem) {
   );
 }
 
+/** 评分统一保留一位小数，无评分时显示占位符 */
 function formatScore(score?: number) {
   if (typeof score !== "number" || Number.isNaN(score)) return "—";
-  // Bangumi score is typically one decimal
   return score.toFixed(1);
 }
 
@@ -85,6 +95,7 @@ export default function HomeScreen() {
   const [query, setQuery] = useState<string>("");
   const router = useRouter();
 
+  /** 提交搜索：关键词非空时跳转到聚合搜索页 */
   const handleSearch = (text: string) => {
     const keyword = text.trim();
     if (keyword) {
@@ -95,6 +106,7 @@ export default function HomeScreen() {
     }
   };
 
+  /** 本地过滤：命中中文名或原名任意一项即算匹配 */
   const matchItem = useCallback((item: CalendarItem, q: string) => {
     if (!q) return true;
     const keyword = q.trim().toLowerCase();
@@ -104,9 +116,11 @@ export default function HomeScreen() {
     );
   }, []);
 
+  /** 拉取每日放送数据，解码 HTML 实体，并调整成以“今天”开头的顺序 */
   const fetchCalendar = useCallback(async () => {
     setError("");
     try {
+      // 加随机 token 规避接口缓存
       const res = await fetch("https://api.bgm.tv/calendar?token=" + Math.random(), {
         headers: {
           Accept: "application/json",
@@ -117,18 +131,18 @@ export default function HomeScreen() {
       }
       const json = (await res.json()) as CalendarDay[];
 
-      // 基本容错：确保数组形态
+      // 基本容错：确保拿到的是数组
       if (!Array.isArray(json)) {
         throw new Error("Response is not an array");
       }
 
-      // 过滤空 items，并按 weekday.id 升序保证顺序稳定
+      // 先剔除星期信息缺失的坏数据，再按“距今天的天数”升序排列
       const todayId = getTodayWeekdayId();
       
       const cleaned = json
         .map((d) => ({
           ...d,
-          // 接口里的 `&amp;`、`&quot;` 等实体需要解码后再展示 / 搜索
+          // 标题、简介里的 `&amp;`、`&quot;` 等实体必须解码，否则展示和搜索都会受影响
           weekday: d.weekday && {
             ...d.weekday,
             cn: decodeHtmlEntities(d.weekday.cn),
@@ -164,6 +178,7 @@ export default function HomeScreen() {
     fetchCalendar();
   }, [fetchCalendar]);
 
+  /** 下拉刷新：只切换刷新态，加载态复用 fetchCalendar */
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -173,13 +188,13 @@ export default function HomeScreen() {
     }
   }, [fetchCalendar]);
 
-  // 网格：根据屏宽动态决定每行个数（可变）
+  /** 按屏宽动态计算每行卡片数；想更紧凑可以调小 minCard */
   const grid = useMemo(() => {
     const horizontalPadding = styles.page.paddingHorizontal ?? 0;
     const sectionPadding = 0;
     const available = width - horizontalPadding * 2 - sectionPadding * 2;
 
-    const minCard = 100; // 想更紧凑可以调小
+    const minCard = 100;
     const gap = 12;
     const cols = Math.max(2, Math.floor((available + gap) / (minCard + gap)));
 
@@ -187,6 +202,7 @@ export default function HomeScreen() {
     return { cols, gap, cardWidth };
   }, [width]);
 
+  /** 安全打开外部链接，无法打开时提示用户 */
   const openUrl = useCallback(async (url: string) => {
     if (!url) return;
     const can = await Linking.canOpenURL(url);
@@ -197,6 +213,7 @@ export default function HomeScreen() {
     Linking.openURL(url);
   }, []);
 
+  /** 按输入的关键词过滤，并丢掉过滤后没有条目的那几天 */
   const filteredData = useMemo(() => {
     if (!query) return data;
 
@@ -212,15 +229,16 @@ export default function HomeScreen() {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.page}
+      // 下拉刷新：tintColor/titleColor 用于 iOS，colors/progressBackgroundColor 用于 Android
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#EEEEEE"     // iOS 菊花颜色
-          title="Loading..."                // 不显示文字就保持空串
-          titleColor="#EEEEEE"    // iOS 文字颜色（title 非空时更明显）
-          colors={["#EEEEEE"]}    // Android 菊花颜色（iOS 会忽略，不影响）
-          progressBackgroundColor="#05070C" // Android 背景色
+          tintColor="#EEEEEE"
+          title="Loading..."
+          titleColor="#EEEEEE"
+          colors={["#EEEEEE"]}
+          progressBackgroundColor="#05070C"
         />
       }
     >
@@ -256,7 +274,7 @@ export default function HomeScreen() {
           style={styles.searchInput}
           clearButtonMode="while-editing"
           keyboardAppearance="dark"
-          // 提交
+          // 键盘回车即提交搜索
           returnKeyType="search" 
           onSubmitEditing={() => handleSearch(query)}
         />
@@ -353,6 +371,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  /** 页面骨架与通用居中容器 */
   container: {
     flex: 1,
     backgroundColor: "#05070C",
@@ -367,7 +386,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 16,
   },
+  loadingHeight: { height: 100 },
+  footerSpace: {
+    height: 24,
+  },
 
+  /** 按天分组的分区块 */
   section: {
     marginTop: 14,
   },
@@ -388,6 +412,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
+  /** 番剧卡片网格 */
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -444,6 +469,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
+  /** 加载失败与重试 */
   title: {
     color: "#E9EDF5",
     fontSize: 18,
@@ -471,10 +497,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  footerSpace: {
-    height: 24,
-  },
-
+  /** 顶部搜索框 */
   searchWrap: {
     marginBottom: 6,
     gap: 6,
@@ -502,7 +525,4 @@ const styles = StyleSheet.create({
     color: "#E9EDF5",
     fontSize: 14,
   },
-
-  loadingHeight: { height: 100 },
-
 });

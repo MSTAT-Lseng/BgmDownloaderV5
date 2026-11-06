@@ -1,15 +1,15 @@
 /**
- * 极简 HTML 实体解码工具。
+ * @file 极简 HTML 实体解码工具。
  *
  * Bangumi 接口返回的标题 / 简介里可能带 `&amp;`、`&quot;`、`&#x2605;`
  * 这类 HTML 实体，直接渲染会原样显示。React Native 没有 DOM，
- * 无法用 textarea / DOMParser 的 hack，所以这里用一个小的映射表处理。
+ * 无法借助 textarea / DOMParser 之类的 hack，所以这里用一张映射表处理。
  *
- * 只解码一次：`&amp;amp;` 会变成 `&amp;`（与浏览器一次解析的结果一致），
+ * 只解码一次：`&amp;amp;` 会变成 `&amp;`（与浏览器单次解析的结果一致），
  * 避免把本该显示的 `&lt;` 等文本过度解码。
  */
 
-/** 常见命名实体 → 字符（小写键名） */
+/** 常见命名实体 → 字符 */
 const NAMED_ENTITIES: Record<string, string> = {
   // 基础转义
   amp: "&",
@@ -96,13 +96,14 @@ const NAMED_ENTITIES: Record<string, string> = {
 /** 匹配 `&name;` / `&#123;` / `&#x1F600;` */
 const ENTITY_RE = /&(#x[0-9a-fA-F]+|#[0-9]+|[a-zA-Z][a-zA-Z0-9]*);/g;
 
+/** 把数字实体（十进制或十六进制）转成字符，非法码点返回 null */
 function decodeNumeric(code: string): string | null {
   const isHex = code[1] === "x" || code[1] === "X";
   const digits = code.slice(isHex ? 2 : 1);
   const value = Number.parseInt(digits, isHex ? 16 : 10);
 
   if (!Number.isFinite(value) || value < 0 || value > 0x10ffff) return null;
-  // 单独的代理项无法组成合法字符，保持原样
+  // 代理项无法单独组成合法字符，保持原样
   if (value >= 0xd800 && value <= 0xdfff) return null;
 
   try {
@@ -126,7 +127,7 @@ export function decodeHtmlEntities(input?: string | null): string {
       const decoded = decodeNumeric(code);
       return decoded ?? match;
     }
-    // 命名实体大小写敏感（Ccedil / ccedil 等），先精确匹配再尝试小写
+    // 命名实体区分大小写（Ccedil / ccedil 等），先精确匹配，再退回小写匹配
     const exact = NAMED_ENTITIES[code];
     if (exact !== undefined) return exact;
 

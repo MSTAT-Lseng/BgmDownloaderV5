@@ -1,9 +1,13 @@
+/**
+ * @file “更多搜索”提示的开关状态存取（AsyncStorage）。
+ */
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEY_MORE_SEARCH_ALERT = 'more_search_alert';
 const DEFAULT_MORE_SEARCH_ALERT = true;
 
-// 获取 more_search_alert
+/** 读取提示开关；默认开启，读取失败时同样按开启处理 */
 export async function getMoreSearchAlert() {
   try {
     const value = await AsyncStorage.getItem(KEY_MORE_SEARCH_ALERT);
@@ -14,7 +18,7 @@ export async function getMoreSearchAlert() {
   }
 }
 
-// 设置 more_search_alert
+/** 写入提示开关；写入失败只打日志，不影响调用方流程 */
 export async function setMoreSearchAlert(status: boolean): Promise<void> {
   try {
     await AsyncStorage.setItem(

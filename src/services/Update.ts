@@ -1,3 +1,7 @@
+/**
+ * @file 版本更新检查：对比远程配置与本地版本号，有新版本时弹窗提示。
+ */
+
 import Constants from 'expo-constants';
 import { Alert, Linking, Platform } from 'react-native';
 import Toast from 'react-native-root-toast';
@@ -15,10 +19,14 @@ interface UpdateResponse {
 
 const UPDATE_URL = 'https://mstat.top/bgm_downloader/update.json';
 
+/**
+ * 检查更新。
+ *
+ * @param showLatest 是否在“已是最新版本”时给出提示；启动时静默检查应传 false
+ */
 export const checkUpdate = async (showLatest = false): Promise<void> => {
   try {
-    // 1. 获取当前版本
-    // nativeAppVersion 获取原生层版本号，expoConfig 获取 app.json 定义的版本
+    // 优先取 app.json 里配置的版本，其次取原生层版本
     const currentVersion = 
       Constants.expoConfig?.version ?? 
       Constants.nativeAppVersion ?? 
@@ -26,13 +34,13 @@ export const checkUpdate = async (showLatest = false): Promise<void> => {
 
     const platform = Platform.OS as 'ios' | 'android';
     
-    // 2. 获取远程配置
+    // 加时间戳规避 CDN 缓存
     const response = await fetch(`${UPDATE_URL}?token=${Date.now()}`);
     const data: UpdateResponse = await response.json();
     
     const config = data[platform];
 
-    // 3. 只有配置存在且版本不同时才弹窗
+    // 版本号不同即视为有新版本
     if (config && config.version !== currentVersion) {
       showUpdateAlert(config);
     } else if (showLatest) {
@@ -50,6 +58,7 @@ export const checkUpdate = async (showLatest = false): Promise<void> => {
   }
 };
 
+/** 弹出更新提示；强制更新时不给取消按钮，也不允许点遮罩关闭 */
 const showUpdateAlert = (config: UpdateConfig): void => {
   const buttons: any[] = [
     { 

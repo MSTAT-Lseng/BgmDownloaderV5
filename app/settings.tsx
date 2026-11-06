@@ -1,3 +1,7 @@
+/**
+ * @file 设置页：目前提供搜索超时时间的选择，以及关于软件的入口。
+ */
+
 import { AppHeader } from '@/components/app-header';
 import {
   getSearchTimeout,
@@ -25,12 +29,14 @@ export default function SettingsScreen() {
 
   const [timeout, setTimeoutState] = useState<number>(5);
 
-  // 超时设置弹窗
+  // 超时设置弹窗：可见性与保存中状态
   const [timeoutModalVisible, setTimeoutModalVisible] = useState(false);
   const [savingTimeout, setSavingTimeout] = useState(false);
 
+  // 可选超时秒数
   const timeoutOptions = useMemo(() => [3, 5, 8, 10, 15, 20], []);
 
+  /** 进入页面时读取已保存的超时时间 */
   useEffect(() => {
     getSearchTimeout().then(setTimeoutState);
   }, []);
@@ -39,11 +45,13 @@ export default function SettingsScreen() {
     setTimeoutModalVisible(true);
   };
 
+  /** 关闭弹窗；保存过程中忽略关闭操作，避免状态错乱 */
   const closeTimeoutPicker = () => {
     if (savingTimeout) return;
     setTimeoutModalVisible(false);
   };
 
+  /** 选中某个超时秒数：写库成功后立即更新界面并关闭弹窗 */
   const handleSelectTimeout = async (value: number) => {
     if (!Number.isFinite(value) || value <= 0) return;
 
@@ -57,6 +65,7 @@ export default function SettingsScreen() {
     }
   };
 
+  // 当前版本号：优先取 app.json 配置，其次取原生层版本
   const currentVersion = 
       Constants.expoConfig?.version ?? 
       Constants.nativeAppVersion ?? 
@@ -68,10 +77,8 @@ export default function SettingsScreen() {
       <AppHeader title={"设置"} showBack={true} onBackPress={() => navigation.goBack()} />
 
       <View style={styles.content}>
-        {/* 分组标题 */}
         <Text style={styles.sectionTitle}>搜索</Text>
 
-        {/* 右侧文字形式 */}
         <SettingItem 
           title="超时时间" 
           icon="timer-outline"
@@ -80,7 +87,7 @@ export default function SettingsScreen() {
           subTitle="加载搜索结果最长的等待时间"
         />
         
-        {/* 开关形式 */}
+        {/* 推送通知暂时下线，需要时取消注释 */}
         {/*<SettingItem 
           title="推送通知"
           subTitle="已开启"
@@ -96,7 +103,7 @@ export default function SettingsScreen() {
 
         <Text style={styles.sectionTitle}>关于</Text>
 
-        {/* 普通箭头跳转 */}
+        {/* 个人资料入口暂时下线，需要时取消注释 */}
         {/*<SettingItem 
           title="个人资料" 
           icon="person-outline"
@@ -169,7 +176,7 @@ export default function SettingsScreen() {
   );
 }
 
-// 通用配置行组件
+/** 通用配置行：左侧图标 + 标题/副标题，右侧文字、自定义元素或箭头 */
 function SettingItem({ title, icon, rightText, rightElement, onPress, subTitle }: any) {
   return (
     <TouchableOpacity 
@@ -197,9 +204,12 @@ function SettingItem({ title, icon, rightText, rightElement, onPress, subTitle }
 }
 
 const styles = StyleSheet.create({
+  /** 页面骨架 */
   container: { flex: 1, backgroundColor: "#05070C" },
   content: { paddingHorizontal: 16, marginTop: 10 },
   sectionTitle: { color: "#666", fontSize: 13, marginBottom: 8, marginTop: 16, marginLeft: 4 },
+
+  /** 配置行 */
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -218,7 +228,7 @@ const styles = StyleSheet.create({
   itemSubText: { color: '#AAA', fontSize: 12 },
   itemTextContainer: { flexDirection: 'column' },
 
-  // Modal / Bottom Sheet
+  /** 底部弹出式选择器 */
   modalMask: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.55)',

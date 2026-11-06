@@ -1,3 +1,7 @@
+/**
+ * @file 聚合搜索页：并发请求所有已适配站点，用各站点配置里的正则解析结果，并按站点分组展示。
+ */
+
 import {
   getSearchTimeout,
 } from '@/src/services/storage/searchTimeout';
@@ -7,15 +11,13 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Toast from 'react-native-root-toast';
 import { AppHeader } from "../components/app-header";
-
-const SOURCES_DIR = "../assets/sources/";
-
-// 导入源列表
 import { getMoreSearchAlert, setMoreSearchAlert } from '@/src/services/storage/moreSearchAlert';
 import { Ionicons } from '@expo/vector-icons';
 import sourceIndex from "../assets/sources/index.json";
 
-// 由于 RN 不支持动态 require，需手动建立映射)
+const SOURCES_DIR = "../assets/sources/";
+
+// RN 不支持动态 require，只能把用到的站点配置手动建立映射
 const sourceConfigs: Record<number, any> = {
   1: require(`${SOURCES_DIR}/config_1.json`),
   4: require(`${SOURCES_DIR}/config_4.json`),
@@ -30,14 +32,16 @@ const sourceConfigs: Record<number, any> = {
   24: require(`${SOURCES_DIR}/config_24.json`),
 };
 
+/** 单条搜索结果 */
 interface SearchResult {
-  id: string; // 唯一标识
+  id: string;
   title: string;
   image: string;
   url: string;
-  sourceName: string; // 源的名称
+  sourceName: string;
 }
 
+/** 按站点分组后的搜索结果；moreUrl 为“查看全部”跳转地址 */
 interface GroupedResult {
   sourceName: string;
   sourceUrl: string;
@@ -45,15 +49,7 @@ interface GroupedResult {
   data: SearchResult[];
 }
 
-// 次元城（cycani）相关配置
-const CYCANI_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1";
-const isCycaniUrl = (url: string) => url.includes("cycani.org");
-
-// 稀饭动漫（xifanacg）的 Supabase 接口需要 apikey 鉴权
-const XIFANACG_API_KEY = "sb_publishable_OBIVAWACIX6lPXrO98_z24_HcsmalkA";
-const isXifanacgUrl = (url: string) => url.includes("xifanacg");
-
-// 将配置中的 {q} 占位符替换为搜索词（支持嵌套对象）
+/** 把配置里的 {q} 占位符替换为搜索词，支持嵌套对象与数组 */
 const fillKeyword = (value: any, keyword: string): any => {
   if (typeof value === "string") {
     return value.replace(/\{q\}/g, keyword);
@@ -71,11 +67,19 @@ const fillKeyword = (value: any, keyword: string): any => {
   return value;
 };
 
-// girigirilove 相关配置
+// 次元城（cycani）
+const CYCANI_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1";
+const isCycaniUrl = (url: string) => url.includes("cycani.org");
+
+// 稀饭动漫（xifanacg），其 Supabase 接口需要 apikey 鉴权
+const XIFANACG_API_KEY = "sb_publishable_OBIVAWACIX6lPXrO98_z24_HcsmalkA";
+const isXifanacgUrl = (url: string) => url.includes("xifanacg");
+
+// girigirilove
 const GIRIGIRILOVE_HOST = "https://ani.girigirilove.com";
 const isGirigiriloveUrl = (url: string) => url.includes("girigirilove");
 
-// 从搜索结果 URL 中提取 vod_id
+/** 从 girigirilove 的各种结果链接中提取 vod_id，取不到时返回空串 */
 const extractGirigiriloveVodId = (url: string): string => {
   if (!url) return "";
   const patterns = [
@@ -96,17 +100,19 @@ export default function SearchScreen() {
   const [loading, setLoading] = useState(false);
   const userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
 
+  /** 关键词变化时重新发起一次聚合搜索 */
   useEffect(() => {
     if (q) {
       handleSearch(q);
     }
   }, [q]);
 
+  /** 并发请求所有已适配站点，拿到一个就展示一个 */
   const handleSearch = async (keyword: string) => {
     setLoading(true);
     setResults([]);
 
-    // 实时获取最新的配置
+    // 超时时间每次实时读取，保证设置页修改后立即生效
     const timeout = await getSearchTimeout();
 
     const activeSources = sourceIndex.filter((s: any) => s.enabled && s.adaptation);
@@ -115,9 +121,9 @@ export default function SearchScreen() {
       const config = sourceConfigs[source.id];
       if (!config) return;
 
-      // 1. 创建 AbortController
+      // 每个站点一个超时定时器，超时后中断该次请求
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout * 1000); // 5.5秒超时
+      const timeoutId = setTimeout(() => controller.abort(), timeout * 1000);
 
       try {
         const { search_config } = config;
@@ -127,7 +133,6 @@ export default function SearchScreen() {
           .replace("{q}", encodeURIComponent(keyword))
           .replace("{host}", source.url);
 
-        // 次元城的搜索接口要求携带 x-app-name
         const isCycani = isCycaniUrl(source.url);
         const isXifanacg = isXifanacgUrl(source.url);
 
@@ -140,7 +145,7 @@ export default function SearchScreen() {
               ? `https://next.xifanacg.com/search?q=${encodeURIComponent(keyword)}`
               : searchUrl;
 
-        // 支持配置中定义 POST 请求体（如稀饭动漫的 Supabase 接口）
+        // 只有配置里声明了 body 才发 POST（如稀饭动漫的 Supabase 接口）
         const requestBody = search_config.body
           ? JSON.stringify(fillKeyword(search_config.body, keyword))
           : undefined;
@@ -152,6 +157,7 @@ export default function SearchScreen() {
             "Priority": "u=3, i", 
             "Accept-Language": "zh-CN,zh-Hans;q=0.9",
             ...(cookie ? { "Cookie": cookie } : {}),
+            // 次元城的搜索接口要求携带 x-app-name
             ...(isCycani ? { "x-app-name": "cyc_web" } : {}),
             ...(isXifanacg ? {
               "apikey": XIFANACG_API_KEY,
@@ -160,8 +166,9 @@ export default function SearchScreen() {
             } : {})
           },
           body: requestBody,
-          credentials: 'omit', // 强制忽略本地 Cookie 池，确保只发送 Header 中定义的 Cookie
-          signal: controller.signal, // 2. 绑定信号
+          // 强制忽略本地 Cookie 池，只发送 Header 里定义的 Cookie
+          credentials: 'omit',
+          signal: controller.signal,
         });
         
         const html = await response.text();
@@ -186,7 +193,6 @@ export default function SearchScreen() {
           console.error(`${source.name} 搜索失败:`, err);
         }
       } finally {
-        // 3. 清除定时器
         clearTimeout(timeoutId);
       }
     });
@@ -195,6 +201,7 @@ export default function SearchScreen() {
       await Promise.allSettled(searchTasks);
     } finally {
       setLoading(false);
+      // 只在第一次搜索时提示右上角还有更多站点，提示后立即写回，避免反复打扰
       const searchAlertStatus = await getMoreSearchAlert();
       if (searchAlertStatus) {
         await setMoreSearchAlert(false);
@@ -203,7 +210,7 @@ export default function SearchScreen() {
     }
   };
 
-  // JSON 接口返回的字符串会带有转义（如封面地址中的 \u0026），需要还原
+  /** 还原 JSON 接口返回的转义字符（如封面地址里的 \\u0026） */
   const decodeJsonEscapes = (value: string) => {
     if (!value || !value.includes("\\")) return value;
     try {
@@ -213,7 +220,7 @@ export default function SearchScreen() {
     }
   };
 
-  // 正则解析核心逻辑
+  /** 按配置里的 item_regex 和字段下标，把响应文本解析成结果列表 */
   const parseHtml = (html: string,
     config: any,
     sourceName: string,
@@ -223,29 +230,27 @@ export default function SearchScreen() {
     const { item_regex, fields } = config;
     const list: SearchResult[] = [];
     
-    // 创建正则对象 (添加 'g' 标志以进行全局匹配)
+    // 加 g 标志才能逐个匹配所有条目
     const regex = new RegExp(item_regex, 'g');
     
     let match;
-    // 循环匹配所有结果
     while ((match = regex.exec(html)) !== null) {
-      // 根据 config 中定义的 match_index 提取数据
-      // 注意：match[0] 是完整匹配，group 从 1 开始
+      // match[0] 是完整匹配，捕获组从 1 开始，配置里的 match_index 即对应捕获组下标
       let image = decodeJsonEscapes(match[fields.image.match_index] || "");
       const url = match[fields.url.match_index] || "";
       let title = decodeJsonEscapes(match[fields.title.match_index] || "");
 
-      // ID 18 特殊处理，其标签含有 span。
+      // 部分站点（如 18 号源）的标题值里混有 span 标签，需要剥掉
       if (title.includes("<span")) {
         title = title.replace(/<\/?span[^>]*>/g, '');
       }
 
-      // image 特殊处理：如果 image 是绝对路径要加域名
+      // 相对路径的封面要补上站点域名
       if (image.startsWith('/')) {
         image = host + image;
       }
 
-      // 百度封面链接中的 &amp; 需要还原为 &
+      // 百度封面链接里的 &amp; 要还原成 &
       if (image.includes("baidu.com")) {
         image = image.replace(/&amp;/g, "&");
       }
@@ -254,7 +259,7 @@ export default function SearchScreen() {
         const rawUrl = url.trim();
         let finalUrl = details_format.replace("{host}", host).replace('{result}', rawUrl);
 
-        // girigirilove：条目统一改写为 https://ani.girigirilove.com/detail/{vod_id}
+        // girigirilove 的条目不直接跳原链接，统一改写为站内详情页地址
         if (isGirigiriloveUrl(host)) {
           const vodId = extractGirigiriloveVodId(rawUrl) || extractGirigiriloveVodId(finalUrl);
           if (vodId) {
@@ -263,7 +268,7 @@ export default function SearchScreen() {
         }
 
         list.push({
-          id: `${sourceName}-${url}`, // 生成临时唯一ID
+          id: `${sourceName}-${url}`, // 用站点名 + 原始地址拼一个临时唯一 ID
           title: title.trim(),
           image: image.trim(),
           url: finalUrl,
@@ -276,7 +281,6 @@ export default function SearchScreen() {
     return list;
   };
 
-  // 在你的页面组件内
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -293,7 +297,7 @@ export default function SearchScreen() {
         data={results}
         keyExtractor={(item) => item.sourceName}
         contentContainerStyle={styles.listContent}
-        // 只有当加载结束且真的没数据时才显示“未找到”
+        // 只有加载结束且确实没有结果时才显示“未找到”
         ListEmptyComponent={!loading ? <Text style={styles.empty}>未找到相关内容</Text> : undefined}
         renderItem={({ item }) => (
           <View style={styles.sourceSection}>
@@ -355,23 +359,29 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
+  /** 搜索中遮罩 */
   loadingOverlay: {
     position: "absolute",
     top: 0,
     right: 0,
     bottom: 0,
-    left: 0, // 铺满全屏（RN 0.88 移除了 StyleSheet.absoluteFillObject）
-    backgroundColor: 'rgba(5, 7, 12, 0.7)', // 半透明背景
+    left: 0, // 手动铺满全屏，RN 0.88 已移除 StyleSheet.absoluteFillObject
+    backgroundColor: 'rgba(5, 7, 12, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 999, // 确保在列表之上
+    zIndex: 999, // 必须高于列表
   },
+
+  /** 页面与列表骨架 */
+  container: { flex: 1, backgroundColor: "#05070C" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  listContent: { paddingTop: 10, paddingBottom: 35 },
+  empty: { color: "#90A0B8", textAlign: "center", marginTop: 50 },
   horizontalList: {
     paddingHorizontal: 7,
   },
 
-  container: { flex: 1, backgroundColor: "#05070C" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  /** 单条结果卡片（当前列表未使用，保留备用） */
   item: { 
     flexDirection: "row", 
     marginBottom: 12, 
@@ -391,17 +401,16 @@ const styles = StyleSheet.create({
     paddingVertical: 2, 
     borderRadius: 4 
   },
-  empty: { color: "#90A0B8", textAlign: "center", marginTop: 50 },
-  listContent: { paddingTop: 10, paddingBottom: 35 },
+
+  /** 按站点分组的分区块 */
   sourceSection: {
-    backgroundColor: "#111827", // 稍亮于背景的深蓝色/灰色
+    backgroundColor: "#111827", // 略亮于页面背景，形成卡片层次
     borderWidth: 1,
-    borderColor: "#1E293B",     // 边框颜色
-    borderRadius: 12,           // 圆角让整体更现代
-    paddingVertical: 15,        // 上下内边距
-    marginHorizontal: 10,       // 左右留白，防止边框贴边
+    borderColor: "#1E293B",
+    borderRadius: 12,
+    paddingVertical: 15,
+    marginHorizontal: 10, // 左右留白，避免边框贴边
     marginVertical: 8,
-    // 阴影（可选，增加层次感）
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -409,7 +418,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   sourceInfoInner: {
-    flex: 1, // 占据剩余空间，防止文字溢出挤压按钮
+    flex: 1, // 占满剩余空间，避免标题把按钮挤出去
     marginRight: 10,
   },
   sourceTitle: {

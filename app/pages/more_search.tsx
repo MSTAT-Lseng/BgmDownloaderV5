@@ -1,3 +1,7 @@
+/**
+ * @file 更多搜索页：列出未做接口适配的站点，供用户手动跳转检索。
+ */
+
 import { AppHeader } from '@/components/app-header';
 import { useNavigation, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -11,11 +15,12 @@ import {
   View
 } from "react-native";
 
-// 1. 直接导入 JSON
+// 站点索引，与 icons 目录下的图标按 icon 字段一一对应
 import sources from "@/assets/sources/index.json";
 
 const SOURCES_PATH = "@/assets/icons/sources";
-// 2. 图标映射表（Expo 必须这样写）
+
+/** 站点图标映射表；RN 不支持动态 require，只能逐个写死 */
 const iconMap: Record<string, any> = {
   "dalvdm": require(`${SOURCES_PATH}/dalvdm.png`),
   "animoe": require(`${SOURCES_PATH}/animoe.png`),
@@ -31,6 +36,7 @@ const iconMap: Record<string, any> = {
 
 const defaultIcon = require(`${SOURCES_PATH}/default.png`);
 
+/** 站点配置条目 */
 type SourceItem = {
   id: number;
   name: string;
@@ -41,16 +47,18 @@ type SourceItem = {
   adaptation: boolean;
 };
 
+/** 取图标资源，缺省时回退到默认图标 */
 function getIcon(iconName: string) {
   return iconMap[iconName] ?? defaultIcon;
 }
 
-
 export default function SearchArchiveScreen() {
   const navigation = useNavigation();
+  // 只展示已启用但没有做接口适配的站点
   const data = (sources as SourceItem[]).filter(item => item.adaptation === false && item.enabled === true);
   const router = useRouter();
 
+  /** 渲染单个站点卡片，点击进入内嵌浏览器 */
   const renderItem = ({ item }: { item: SourceItem }) => (
     <TouchableOpacity
       style={styles.card}
@@ -103,14 +111,16 @@ export default function SearchArchiveScreen() {
 }
 
 const styles = StyleSheet.create({
+  /** 页面骨架 */
   container: {
     flex: 1,
     backgroundColor: '#05070C'
   },
-
   list: {
     padding: 16,
   },
+
+  /** 站点卡片 */
   card: {
     flexDirection: "row",
     backgroundColor: "#0B0F1A",

@@ -1,3 +1,7 @@
+/**
+ * @file 源列表页：列出所有已启用的可搜索站点，点击后在内嵌浏览器中打开。
+ */
+
 import { useRouter } from "expo-router";
 import {
   FlatList,
@@ -8,11 +12,12 @@ import {
   View
 } from "react-native";
 
-// 1. 直接导入 JSON
+// 站点索引，与 icons 目录下的图标按 icon 字段一一对应
 import sources from "@/assets/sources/index.json";
 
 const SOURCES_PATH = "@/assets/icons/sources";
-// 2. 图标映射表（Expo 必须这样写）
+
+/** 站点图标映射表；RN 不支持动态 require，只能逐个写死 */
 const iconMap: Record<string, any> = {
   "cycani": require(`${SOURCES_PATH}/cycani.png`),
   "dalvdm": require(`${SOURCES_PATH}/dalvdm.png`),
@@ -42,10 +47,11 @@ const iconMap: Record<string, any> = {
 
 const defaultIcon = require(`${SOURCES_PATH}/default.png`);
 
-// 跳转 WebView 时附带的 User-Agent（伪装成 iPhone Safari，部分站点会按 UA 下发不同的播放页）
+// 跳转 WebView 时附带的 UA（伪装成 iPhone Safari，部分站点会按 UA 下发不同的播放页）
 const WEBVIEW_USER_AGENT =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1";
 
+/** 站点配置条目 */
 type SourceItem = {
   id: number;
   name: string;
@@ -56,6 +62,7 @@ type SourceItem = {
   adaptation: boolean;
 };
 
+/** 取图标资源，缺省时回退到默认图标 */
 function getIcon(iconName: string) {
   return iconMap[iconName] ?? defaultIcon;
 }
@@ -64,6 +71,7 @@ export default function SourceScreen() {
   const data = (sources as SourceItem[]).filter(item => item.enabled);
   const router = useRouter();
 
+  /** 渲染单个站点卡片，点击进入内嵌浏览器 */
   const renderItem = ({ item }: { item: SourceItem }) => (
     <TouchableOpacity
       style={styles.card}
@@ -108,6 +116,7 @@ export default function SourceScreen() {
 }
 
 const styles = StyleSheet.create({
+  /** 页面骨架 */
   container: {
     flex: 1,
     backgroundColor: "#05070C",
@@ -115,6 +124,8 @@ const styles = StyleSheet.create({
   list: {
     padding: 16,
   },
+
+  /** 站点卡片 */
   card: {
     flexDirection: "row",
     backgroundColor: "#0B0F1A",

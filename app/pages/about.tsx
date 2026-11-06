@@ -1,3 +1,7 @@
+/**
+ * @file 关于页：展示应用信息，提供官网、检查更新与邮箱反馈入口。
+ */
+
 import { AppHeader } from '@/components/app-header';
 import { checkUpdate } from '@/src/services/Update';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,18 +22,20 @@ import Toast from 'react-native-root-toast';
 
 export default function AboutScreen() {
   const navigation = useNavigation();
+  // 当前版本号：优先取 app.json 配置，其次取原生层版本
   const appVersion = 
       Constants.expoConfig?.version ?? 
       Constants.nativeAppVersion ?? 
       '0.0.0';
 
-  // 处理外部链接跳转
+  /** 打开外部链接，失败时只打印日志 */
   const openUrl = (url: string) => {
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
   };
 
   const logo = require('../../assets/images/icon.png');
 
+  /** 手动检查更新：先提示，再交给统一更新逻辑弹窗 */
   const checkUpdateHandler = async () => {
     Toast.show(`检查更新中...`, {
       duration: Toast.durations.SHORT,
@@ -44,14 +50,12 @@ export default function AboutScreen() {
       <AppHeader title={"关于"} showBack={true} onBackPress={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* 顶部 Logo 与 名称 */}
         <View style={styles.logoSection}>
           <Image source={logo} style={styles.logo} />
           <Text style={styles.appName}>番剧下载</Text>
           <Text style={styles.appVersion}>Version {appVersion}</Text>
         </View>
 
-        {/* 列表项 */}
         <View style={styles.listSection}>
           <AboutItem 
             title="访问官网" 
@@ -75,7 +79,6 @@ export default function AboutScreen() {
         </View>
       </ScrollView>
 
-      {/* 底部版权 */}
       <View style={styles.footer}>
         <Text style={styles.copyright}>Copyright © 2026 过气萌新</Text>
         <Text style={styles.copyright}>Some Rights Reserved</Text>
@@ -84,7 +87,7 @@ export default function AboutScreen() {
   );
 }
 
-// 复用 SettingItem 风格的组件
+/** 关于页的列表行，与设置页的 SettingItem 风格保持一致 */
 function AboutItem({ title, icon, onPress, subTitle }: any) {
   return (
     <TouchableOpacity style={styles.item} onPress={onPress} activeOpacity={0.7}>
@@ -101,18 +104,26 @@ function AboutItem({ title, icon, onPress, subTitle }: any) {
 }
 
 const styles = StyleSheet.create({
+  /** 页面骨架 */
   container: { flex: 1, backgroundColor: "#05070C" },
   scrollContent: { paddingHorizontal: 16, paddingTop: 40 },
-  
-  // Logo 区域
+
+  /** Logo 与版本号 */
   logoSection: {
     alignItems: 'center',
     marginBottom: 40,
   },
   appName: { color: '#FFF', fontSize: 22, fontWeight: 'bold' },
   appVersion: { color: '#999', fontSize: 14, marginTop: 4 },
+  logo: {
+    width: 92,
+    height: 92,
+    resizeMode: 'contain',
+    borderRadius: 20,
+    marginBottom: 16,
+  },
 
-  // 列表区域
+  /** 功能列表 */
   listSection: {},
   item: {
     flexDirection: 'row',
@@ -130,7 +141,7 @@ const styles = StyleSheet.create({
   itemText: { color: '#FFF', fontSize: 16 },
   itemSubText: { color: '#AAA', fontSize: 12, marginTop: 2 },
 
-  // 底部版权
+  /** 底部版权 */
   footer: {
     paddingBottom: 30,
     alignItems: 'center',
@@ -139,13 +150,5 @@ const styles = StyleSheet.create({
     color: '#444',
     fontSize: 12,
     lineHeight: 18,
-  },
-
-  logo: {
-    width: 92,
-    height: 92,
-    resizeMode: 'contain',
-    borderRadius: 20,
-    marginBottom: 16,
   },
 });

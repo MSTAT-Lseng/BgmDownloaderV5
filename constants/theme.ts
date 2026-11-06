@@ -1,6 +1,8 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * @file 浅色 / 深色主题的基础色板与字体族。
+ *
+ * 颜色分 light、dark 两套，取值需与 app 的深色基调保持一致；
+ * 更多配色方案可参考 NativeWind、Tamagui、unistyles 等方案。
  */
 
 import { Platform } from 'react-native';
@@ -8,6 +10,7 @@ import { Platform } from 'react-native';
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+/** 主题色板 */
 export const Colors = {
   light: {
     text: '#11181C',
@@ -27,6 +30,7 @@ export const Colors = {
   },
 };
 
+/** 各平台的字体族，按系统设计风格取名 */
 export const Fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */

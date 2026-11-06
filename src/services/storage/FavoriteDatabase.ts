@@ -1,7 +1,13 @@
+/**
+ * @file 收藏的本地存储（expo-sqlite）：建表、增删改查都在这里统一封装。
+ */
+
 import * as SQLite from "expo-sqlite";
 
+/** 单条收藏 */
 export type FavoriteItem = { name: string; url: string };
 
+/** 列表查询参数 */
 export type ListOptions = {
   limit?: number;
   offset?: number;
@@ -13,25 +19,32 @@ export type ListOptions = {
 const DB_NAME = "app.db";
 const TABLE = "favorites";
 
+/** 校验必填字段，空白值直接抛错，避免脏数据落库 */
 function assertNonEmpty(v: string, field: string) {
   if (!v || !v.trim()) throw new Error(`${field}不能为空`);
 }
+/** 统一去除首尾空白 */
 function norm(s: string) {
   return s.trim();
 }
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
+/**
+ * 获取数据库连接，首次调用才真正打开，之后复用同一个 Promise。
+ *
+ * Expo 54 + expo-sqlite 16 的推荐写法就是 openDatabaseAsync；
+ * 若后续用到 FTS 等扩展、并遇到关闭连接相关的问题，可在这里补 options。
+ */
 async function getDb() {
   if (!dbPromise) {
-    // Expo 54 + expo-sqlite 16: openDatabaseAsync 是标准用法
-    // 若你后续用到 FTS/扩展并遇到关闭连接相关问题，可考虑加 options（见下方备注）
     dbPromise = SQLite.openDatabaseAsync(DB_NAME);
   }
   return dbPromise;
 }
 
 export class FavoritesDB {
+  /** 建表并创建索引，可重复调用 */
   static async init() {
     const db = await getDb();
     await db.execAsync(`
@@ -46,6 +59,7 @@ export class FavoritesDB {
     `);
   }
 
+  /** 按 url 冲突时只更新名称 */
   static async upsert(item: FavoriteItem) {
     const db = await getDb();
     const name = norm(item.name);
@@ -63,6 +77,7 @@ export class FavoritesDB {
     );
   }
 
+  /** 新增一条收藏；与已有 url 冲突时会抛错，需要覆盖请用 upsert */
   static async add(item: FavoriteItem) {
     const db = await getDb();
     const name = norm(item.name);
@@ -76,6 +91,7 @@ export class FavoritesDB {
     ]);
   }
 
+  /** 判断该 url 是否已收藏 */
   static async exists(url: string) {
     const db = await getDb();
     const u = norm(url);
@@ -88,6 +104,7 @@ export class FavoritesDB {
     return (row?.cnt ?? 0) > 0;
   }
 
+  /** 按 url 查询单条收藏，不存在时返回 null */
   static async getByUrl(url: string) {
     const db = await getDb();
     const u = norm(url);
@@ -100,6 +117,7 @@ export class FavoritesDB {
     return row ?? null;
   }
 
+  /** 分页列出收藏；关键字会同时匹配名称和 url，排序字段做了白名单过滤 */
   static async list(opts: ListOptions = {}) {
     const db = await getDb();
     const {
@@ -136,6 +154,7 @@ export class FavoritesDB {
     );
   }
 
+  /** 按 url 删除一条收藏 */
   static async removeByUrl(url: string) {
     const db = await getDb();
     const u = norm(url);
@@ -143,11 +162,13 @@ export class FavoritesDB {
     await db.runAsync(`DELETE FROM ${TABLE} WHERE url = ?;`, [u]);
   }
 
+  /** 清空全部收藏 */
   static async clear() {
     const db = await getDb();
     await db.runAsync(`DELETE FROM ${TABLE};`);
   }
 
+  /** 按原 url 更新名称和/或 url；两项都没给时直接返回 */
   static async updateByUrl(url: string, patch: Partial<FavoriteItem>) {
     const db = await getDb();
     const u = norm(url);

@@ -1,3 +1,7 @@
+/**
+ * @file 收藏页：读取本地收藏列表，支持点击打开、长按删除，并在回到页面时自动刷新。
+ */
+
 import { FavoriteItem, FavoritesDB } from "@/src/services/storage/FavoriteDatabase";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -15,6 +19,7 @@ export default function FavoriteScreen() {
   const [items, setItems] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  /** 从数据库读取全部收藏，按名称升序 */
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -33,6 +38,8 @@ export default function FavoriteScreen() {
   }, [load]);
 
   const router = useRouter();
+
+  /** 以播放页模式打开收藏的地址 */
   const onOpen = useCallback(async (url: string) => {
     try {
       router.push({
@@ -45,6 +52,7 @@ export default function FavoriteScreen() {
     }
   }, []);
 
+  /** 长按弹出删除确认，确认后同步更新列表，避免重新查库带来的等待 */
   const onLongPressDelete = useCallback((it: FavoriteItem) => {
     Alert.alert(
       "删除收藏？",
@@ -57,7 +65,6 @@ export default function FavoriteScreen() {
           onPress: async () => {
             try {
               await FavoritesDB.removeByUrl(it.url);
-              // 本地同步删除，避免再查库造成等待
               setItems((prev) => prev.filter((x) => x.url !== it.url));
             } catch (e) {
               console.error(e);
@@ -69,18 +76,15 @@ export default function FavoriteScreen() {
     );
   }, []);
 
+  /** 页面每次获得焦点都重新加载，保证其他页面新增的收藏能及时出现 */
   useFocusEffect(
     useCallback(() => {
-      // 页面显示（获得焦点）
       load();
-
-      // 返回函数：页面隐藏（失去焦点）时触发
-      return () => {
-        // 这里一般不需要做什么；如需停止订阅/定时器可放这里
-      };
+      // 这里暂无需清理的订阅或定时器，如需清理从此处返回
     }, [load])
   );
 
+  /** 渲染单条收藏卡片 */
   const renderItem = ({ item }: { item: FavoriteItem }) => {
     return (
       <Pressable
